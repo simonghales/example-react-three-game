@@ -9,6 +9,7 @@ import {FullScreen, useFullScreenHandle} from "react-full-screen";
 import Lights from "../Lights/Lights";
 import Camera from "../Camera/Camera";
 import Mob from "../Mob/Mob";
+import DevMenu from "../DevMenu/DevMenu";
 
 const StyledContainer = styled.div`
     position: fixed;
@@ -16,12 +17,6 @@ const StyledContainer = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-`;
-
-const StyledFullscreen = styled.button`
-    position: absolute;
-    top: 10px;
-    right: 10px;
 `;
 
 const Game: React.FC = () => {
@@ -39,13 +34,7 @@ const Game: React.FC = () => {
                     <Stats/>
                 </Canvas>
                 <Joystick/>
-                {
-                    !active && (
-                        <StyledFullscreen onClick={enter}>
-                            FULLSCREEN
-                        </StyledFullscreen>
-                    )
-                }
+                <DevMenu onFullscreen={enter}/>
             </StyledContainer>
         </FullScreen>
     );

@@ -4,6 +4,8 @@ import {gameRefs} from "../../../state/refs";
 import {Vector3} from "three";
 import {cameraPosition, playerPosition} from "../../../state/positions";
 import {numLerp} from "../../../utils/numbers";
+import {useProxy} from "valtio";
+import {devState} from "../../../state/dev";
 
 const cameraYOffset = 15
 
@@ -19,7 +21,8 @@ const Camera: React.FC = () => {
     const lightRef: any = useResource()
     const ref = useRef<any>()
     const {setDefaultCamera} = useThree()
-    // Make the camera known to the system
+    const localDevState = useProxy(devState)
+    const targetLocked = localDevState.targetLocked
 
     useEffect(() => void setDefaultCamera(ref.current), [])
 
@@ -40,8 +43,10 @@ const Camera: React.FC = () => {
         let newX = x
         let newY = y
 
-        const playerXDiff = Math.round((playerPosition.x - playerPosition.previousX) * 5000)
-        const playerYDiff = Math.round((playerPosition.y - playerPosition.previousY) * 5000)
+        const isTargetLocked = targetLocked
+
+        const playerXDiff = Math.round((playerPosition.x - playerPosition.previousX) * (isTargetLocked ? 2500 : 5000))
+        const playerYDiff = Math.round((playerPosition.y - playerPosition.previousY) * (isTargetLocked ? 2500 : 5000))
 
         const moving = playerYDiff !== 0 || playerXDiff !== 0
 
@@ -66,6 +71,13 @@ const Camera: React.FC = () => {
             newY = playerPosition.y + (adjustedYDiff * 0.01) - cameraYOffset
         }
 
+        if (isTargetLocked) {
+
+            newX = numLerp(newX, playerPosition.targetX, 0.33)
+            newY = numLerp(newY, playerPosition.targetY - cameraYOffset, 0.33)
+
+        }
+
         let xDiff = Math.abs(x - newX)
         let yDiff = Math.abs(y - newY)
 
@@ -82,7 +94,7 @@ const Camera: React.FC = () => {
 
         // not at rest if camera moving, or camera was moving and player is still moving
 
-        if ((xDiff > 0.05 || yDiff > 0.05) || (!data.atRest && moving)) {
+        if ((xDiff > 0.05 || yDiff > 0.05) || (!data.atRest && moving) || isTargetLocked) {
             data.atRest = false
             data.atRestTimestamp = 0
         } else {

@@ -12,6 +12,7 @@ import {usePlayerControls} from "./hooks/controls";
 import {InputKeys, inputsState} from "../../../state/inputs";
 import {lerpRadians, numLerp, PI, PI_TIMES_TWO} from "../../../utils/numbers";
 import {DIAGONAL} from "../../../utils/common";
+import {devState} from "../../../state/dev";
 
 const nippleState = {
     active: false,
@@ -38,6 +39,8 @@ const Player: React.FC = () => {
     const ref = useRef<any>()
     usePlayerControls()
     const localPlayerState = useProxy(playerState)
+    const localDevState = useProxy(devState)
+    const targetLocked = localDevState.targetLocked
 
     useEffect(() => {
         gameRefs.player = ref.current
@@ -112,13 +115,26 @@ const Player: React.FC = () => {
             prevAngle -= PI_TIMES_TWO
         }
 
-        if (isMoving) {
-            const angle = Math.atan2(-yVel, xVel) - radians(270)
-            playerVelocity.targetAngle = angle
-        }
+        const isTargetLocked = targetLocked
 
-        if (prevAngle !== playerVelocity.targetAngle) {
-            ref.current.rotation.y = lerpRadians(prevAngle, playerVelocity.targetAngle, 10 * delta)
+        if (isTargetLocked) {
+
+            const targetX = playerPosition.targetX
+            const targetY = playerPosition.targetY
+            const angle = Math.atan2((targetX - newX), (targetY - newY))
+            ref.current.rotation.y = lerpRadians(prevAngle, angle, 10 * delta)
+            playerVelocity.targetAngle = angle
+        } else {
+
+            if (isMoving) {
+                const angle = Math.atan2(-yVel, xVel) - radians(270)
+                playerVelocity.targetAngle = angle
+            }
+
+            if (prevAngle !== playerVelocity.targetAngle) {
+                ref.current.rotation.y = lerpRadians(prevAngle, playerVelocity.targetAngle, 10 * delta)
+            }
+
         }
 
         if (playerState.moving !== isMoving) {

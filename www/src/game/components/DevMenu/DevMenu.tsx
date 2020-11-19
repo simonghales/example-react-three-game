@@ -1,0 +1,35 @@
+import React from "react";
+import styled from "styled-components";
+import {useProxy} from "valtio";
+import {devState} from "../../../state/dev";
+
+const StyledContainer = styled.div`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+`;
+
+const StyledFullscreen = styled.button`
+`;
+
+const DevMenu: React.FC<{
+    onFullscreen: () => void,
+}> = ({onFullscreen}) => {
+
+    const localDevState = useProxy(devState)
+
+    return (
+        <StyledContainer>
+            <div>
+                <StyledFullscreen onClick={onFullscreen}>
+                    FULLSCREEN
+                </StyledFullscreen>
+            </div>
+            <div>
+                <button onClick={() => devState.targetLocked = !localDevState.targetLocked}>Toggle target locked</button>
+            </div>
+        </StyledContainer>
+    );
+};
+
+export default DevMenu;
