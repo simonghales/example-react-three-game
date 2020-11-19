@@ -6,7 +6,7 @@ import { useFrame } from 'react-three-fiber'
 import { useGLTF } from '@react-three/drei/useGLTF'
 
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
-import {AnimationMixer, Bone, Mesh, MeshPhongMaterial, SkinnedMesh} from "three";
+import {AnimationMixer, Bone, Mesh, MeshPhongMaterial, MeshToonMaterial, SkinnedMesh} from "three";
 import {hexStringToCode} from "../../../utils/color";
 
 type GLTFResult = GLTF & {
@@ -33,14 +33,15 @@ type ActionName =
   | 'Walk'
 type GLTFActions = Record<ActionName, THREE.AnimationAction>
 
-const lightOrangeIndividualMaterial = new MeshPhongMaterial({
+const lightOrangeIndividualMaterial = new MeshToonMaterial({
   color: hexStringToCode("#393939"),
   skinning: true,
 });
 lightOrangeIndividualMaterial.color.convertSRGBToLinear();
 
-export default function Warrior({moving, ...props}: JSX.IntrinsicElements['group'] & {
+export default function Warrior({moving, running, ...props}: JSX.IntrinsicElements['group'] & {
   moving: boolean,
+  running: boolean,
 }) {
   const group = useRef<THREE.Group>()
   const { nodes, animations } = useGLTF('/Warrior.glb') as GLTFResult
@@ -73,7 +74,11 @@ export default function Warrior({moving, ...props}: JSX.IntrinsicElements['group
     let newAnimation = actions.current.Idle
 
     if (moving) {
-      newAnimation = actions.current.Walk
+      if (running) {
+        newAnimation = actions.current.Run
+      } else {
+        newAnimation = actions.current.Walk
+      }
     }
 
     if (currentAnimation && currentAnimation !== newAnimation)  {
@@ -90,7 +95,7 @@ export default function Warrior({moving, ...props}: JSX.IntrinsicElements['group
 
     currentAnimationRef.current = newAnimation
 
-  }, [moving])
+  }, [moving, running])
   return (
     <group ref={group} {...props} dispose={null}>
       <primitive object={nodes.Root} />

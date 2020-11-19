@@ -7,22 +7,36 @@ import Warrior from "../../../3d/models/Warrior/Warrior";
 import {radians} from "../../../utils/angles";
 import {gameRefs} from "../../../state/refs";
 import {usePlayerCamera} from "./hooks/camera";
+import {playerPosition} from "../../../state/positions";
+import {usePlayerControls} from "./hooks/controls";
+import {InputKeys, inputsState} from "../../../state/inputs";
+import {lerpRadians, numLerp, PI, PI_TIMES_TWO} from "../../../utils/numbers";
+import {DIAGONAL} from "../../../utils/common";
+
+const nippleState = {
+    active: false,
+}
 
 const playerVelocity = {
     x: 0,
     y: 0,
+    previousX: 0,
+    previousY: 0,
+    targetAngle: 0,
 }
 
 const playerState = proxy({
     moving: false,
+    running: false,
 })
 
-const speed = 5
+const WALKING_SPEED = 5
+const RUNNING_SPEED = WALKING_SPEED * 2
 
 const Player: React.FC = () => {
 
     const ref = useRef<any>()
-    usePlayerCamera(ref)
+    usePlayerControls()
     const localPlayerState = useProxy(playerState)
 
     useEffect(() => {
@@ -32,44 +46,100 @@ const Player: React.FC = () => {
     useEffect(() => {
 
         nippleManager?.on("start", () => {
+            nippleState.active = true
         })
 
         nippleManager?.on("end", () => {
+            nippleState.active = false
+            playerVelocity.previousX = 0
+            playerVelocity.previousY = 0
             playerVelocity.x = 0
             playerVelocity.y = 0
         })
 
         nippleManager?.on("move", (_, data) => {
             const {x, y} = data.vector
+            playerVelocity.previousX = playerVelocity.x
+            playerVelocity.previousY = playerVelocity.y
             playerVelocity.x = x * -1
             playerVelocity.y = y
         })
 
     }, [])
 
-    useFrame((state, delta) => {
+    useFrame(({gl, scene, camera}, delta) => {
         if (!ref.current) return
 
-        const isMoving = playerVelocity.x !== 0 || playerVelocity.y !== 0
+        const {x, z: y} = ref.current.position
 
-        ref.current.position.x += delta * playerVelocity.x * speed
-        ref.current.position.z += delta * playerVelocity.y * speed
+        let newX = x
+        let newY = y
+
+        let xVel = numLerp(playerVelocity.previousX, playerVelocity.x, 0.75)
+        let yVel = numLerp(playerVelocity.previousY, playerVelocity.y, 0.75)
+
+        if (!nippleState.active) {
+            let up = inputsState[InputKeys.UP].active
+            let right = inputsState[InputKeys.RIGHT].active
+            let down = inputsState[InputKeys.DOWN].active
+            let left = inputsState[InputKeys.LEFT].active
+            xVel = left ? 1 : right ? -1 : 0
+            yVel = up ? 1 : down ? -1 : 0
+
+            if (xVel !== 0 && yVel !== 0) {
+                xVel = xVel * DIAGONAL
+                yVel = yVel * DIAGONAL
+            }
+
+        }
+
+        const isMoving = xVel !== 0 || yVel !== 0
+        const isRunning = inputsState[InputKeys.SHIFT].active
 
         if (isMoving) {
-            const angle = Math.atan2(-playerVelocity.y, playerVelocity.x) - radians(270)
-            ref.current.rotation.y = angle
+
+            let speed = isRunning ? RUNNING_SPEED : WALKING_SPEED
+            newX = x + delta * xVel * speed
+            newY = y + delta * yVel * speed
+            ref.current.position.x = newX
+            ref.current.position.z = newY
+            playerPosition.x = newX
+            playerPosition.y = newY
+        }
+
+        let prevAngle = ref.current.rotation.y // convert to low equivalent angle
+        if (prevAngle > PI) {
+            prevAngle -= PI_TIMES_TWO
+        }
+
+        if (isMoving) {
+            const angle = Math.atan2(-yVel, xVel) - radians(270)
+            playerVelocity.targetAngle = angle
+        }
+
+        if (prevAngle !== playerVelocity.targetAngle) {
+            ref.current.rotation.y = lerpRadians(prevAngle, playerVelocity.targetAngle, 10 * delta)
         }
 
         if (playerState.moving !== isMoving) {
             playerState.moving = isMoving
         }
 
-    })
+        if (playerState.running !== isRunning) {
+            playerState.running = isRunning
+        }
+
+        playerPosition.previousX = x
+        playerPosition.previousY = y
+
+        gl.render(scene, camera)
+
+    }, 100)
 
     return (
         <group position={[0, 0, 0]} ref={ref}>
             <Suspense fallback={null}>
-                <Warrior moving={localPlayerState.moving}/>
+                <Warrior moving={localPlayerState.moving} running={localPlayerState.running}/>
             </Suspense>
         </group>
     );

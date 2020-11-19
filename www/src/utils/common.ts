@@ -1,0 +1,1 @@
+export const DIAGONAL = 0.707

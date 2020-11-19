@@ -8,6 +8,7 @@ import Joystick from "../Joystick/Joystick";
 import {FullScreen, useFullScreenHandle} from "react-full-screen";
 import Lights from "../Lights/Lights";
 import Camera from "../Camera/Camera";
+import Mob from "../Mob/Mob";
 
 const StyledContainer = styled.div`
     position: fixed;
@@ -33,8 +34,8 @@ const Game: React.FC = () => {
                     <Camera/>
                     <Lights/>
                     <Floor/>
-                    <Box/>
                     <Player/>
+                    <Mob/>
                     <Stats/>
                 </Canvas>
                 <Joystick/>
