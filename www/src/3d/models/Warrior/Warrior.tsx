@@ -62,6 +62,7 @@ export default function Warrior({moving, running, ...props}: JSX.IntrinsicElemen
       Sword_Attack: mixer.clipAction(animations[8], group.current),
       Walk: mixer.clipAction(animations[9], group.current),
     }
+    actions.current.Walk.setDuration(1)
     return () => animations.forEach((clip) => mixer.uncacheClip(clip))
   }, [])
   useEffect(() => {
@@ -85,7 +86,6 @@ export default function Warrior({moving, running, ...props}: JSX.IntrinsicElemen
       currentAnimation.fadeOut(duration)
       newAnimation
           .reset()
-          .setEffectiveTimeScale(1)
           .setEffectiveWeight(1)
           .fadeIn(duration)
           .play();

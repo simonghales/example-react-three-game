@@ -23,6 +23,7 @@ const Camera: React.FC = () => {
     const {setDefaultCamera} = useThree()
     const localDevState = useProxy(devState)
     const targetLocked = localDevState.targetLocked
+    const inDanger = localDevState.inDanger
 
     useEffect(() => void setDefaultCamera(ref.current), [])
 
@@ -53,7 +54,7 @@ const Camera: React.FC = () => {
         const cameraXDiff = x - playerPosition.x
         const cameraYDiff = (y - playerPosition.y) + cameraYOffset
 
-        let movedSufficiently = !data.atRest || (Math.abs(cameraXDiff) > 6 || Math.abs(cameraYDiff) > 3) || (Math.abs(playerXDiff) > 500 || Math.abs(playerYDiff) > 500)
+        let movedSufficiently = inDanger || !data.atRest || (Math.abs(cameraXDiff) > 6 || Math.abs(cameraYDiff) > 3) || (Math.abs(playerXDiff) > 500 || Math.abs(playerYDiff) > 500)
 
         if (movedSufficiently) {
 

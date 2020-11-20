@@ -10,6 +10,7 @@ import Lights from "../Lights/Lights";
 import Camera from "../Camera/Camera";
 import Mob from "../Mob/Mob";
 import DevMenu from "../DevMenu/DevMenu";
+import Physics from "../../../physics/components/Physics/Physics";
 
 const StyledContainer = styled.div`
     position: fixed;
@@ -26,12 +27,14 @@ const Game: React.FC = () => {
         <FullScreen handle={handle}>
             <StyledContainer>
                 <Canvas concurrent shadowMap>
-                    <Camera/>
-                    <Lights/>
-                    <Floor/>
-                    <Player/>
-                    <Mob/>
-                    <Stats/>
+                    <Physics>
+                        <Camera/>
+                        <Lights/>
+                        <Floor/>
+                        <Player/>
+                        <Mob/>
+                        <Stats/>
+                    </Physics>
                 </Canvas>
                 <Joystick/>
                 <DevMenu onFullscreen={enter}/>

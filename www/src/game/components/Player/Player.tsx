@@ -1,4 +1,4 @@
-import React, {Suspense, useEffect, useRef} from "react";
+import React, {Suspense, useCallback, useEffect, useRef} from "react";
 import Male from "../../../3d/models/Character/Male";
 import {nippleManager} from "../Joystick/Joystick";
 import {useFrame} from "react-three-fiber";
@@ -13,6 +13,9 @@ import {InputKeys, inputsState} from "../../../state/inputs";
 import {lerpRadians, numLerp, PI, PI_TIMES_TWO} from "../../../utils/numbers";
 import {DIAGONAL} from "../../../utils/common";
 import {devState} from "../../../state/dev";
+import {useBody} from "../../../physics/components/Physics/hooks";
+import {BodyShape, BodyType} from "../../../physics/bodies";
+import {Vec2} from "planck-js";
 
 const nippleState = {
     active: false,
@@ -34,9 +37,27 @@ const playerState = proxy({
 const WALKING_SPEED = 5
 const RUNNING_SPEED = WALKING_SPEED * 2
 
+const tempVec2 = Vec2(0, 0)
+
 const Player: React.FC = () => {
 
-    const ref = useRef<any>()
+    const onCollideStart = useCallback(() => {
+        console.log('collide start')
+    }, [])
+
+    const onCollideEnd = useCallback(() => {
+        console.log('collide end')
+    }, [])
+
+    const [ref, api] = useBody(() => ({
+        type: BodyType.dynamic,
+        shape: BodyShape.circle,
+        radius: 0.75,
+        position: Vec2(0, 0),
+        fixtureOptions: {
+        }
+    }), onCollideStart, onCollideEnd)
+
     usePlayerControls()
     const localPlayerState = useProxy(playerState)
     const localDevState = useProxy(devState)
@@ -73,10 +94,18 @@ const Player: React.FC = () => {
     useFrame(({gl, scene, camera}, delta) => {
         if (!ref.current) return
 
+        const {
+            previousX,
+            previousY
+        } = playerPosition
+
+        playerPosition.previousX = playerPosition.x
+        playerPosition.previousY = playerPosition.y
+
         const {x, z: y} = ref.current.position
 
-        let newX = x
-        let newY = y
+        playerPosition.x = x
+        playerPosition.y = y
 
         let xVel = numLerp(playerVelocity.previousX, playerVelocity.x, 0.75)
         let yVel = numLerp(playerVelocity.previousY, playerVelocity.y, 0.75)
@@ -102,12 +131,19 @@ const Player: React.FC = () => {
         if (isMoving) {
 
             let speed = isRunning ? RUNNING_SPEED : WALKING_SPEED
-            newX = x + delta * xVel * speed
-            newY = y + delta * yVel * speed
-            ref.current.position.x = newX
-            ref.current.position.z = newY
-            playerPosition.x = newX
-            playerPosition.y = newY
+
+            const adjustedXVel = xVel * speed
+            const adjustedYVel = yVel * speed
+            tempVec2.set(adjustedXVel, adjustedYVel)
+            api.setLinearVelocity(tempVec2)
+
+            // newX = x + delta * xVel * speed
+            // newY = y + delta * yVel * speed
+            // ref.current.position.x = newX
+            // ref.current.position.z = newY
+        } else {
+            tempVec2.set(0, 0)
+            api.setLinearVelocity(tempVec2)
         }
 
         let prevAngle = ref.current.rotation.y // convert to low equivalent angle
@@ -121,7 +157,7 @@ const Player: React.FC = () => {
 
             const targetX = playerPosition.targetX
             const targetY = playerPosition.targetY
-            const angle = Math.atan2((targetX - newX), (targetY - newY))
+            const angle = Math.atan2((targetX - x), (targetY - y))
             ref.current.rotation.y = lerpRadians(prevAngle, angle, 10 * delta)
             playerVelocity.targetAngle = angle
         } else {
@@ -144,9 +180,6 @@ const Player: React.FC = () => {
         if (playerState.running !== isRunning) {
             playerState.running = isRunning
         }
-
-        playerPosition.previousX = x
-        playerPosition.previousY = y
 
         gl.render(scene, camera)
 

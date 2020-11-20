@@ -8249,6 +8249,11 @@ pkg-up@3.1.0:
   dependencies:
     find-up "^3.0.0"
 
+planck-js@^0.3.22:
+  version "0.3.22"
+  resolved "https://registry.yarnpkg.com/planck-js/-/planck-js-0.3.22.tgz#c0d29ca296a20f7b55b97259ca71053623070ee8"
+  integrity sha512-aR7EeqPTdxnQJASk1DsS2ryRf1UCaHXR1F/VdKP2tJckXmwG4MHtTSQGKq9UcE1kZr5beFkgVLnBKBeq9u4ngA==
+
 pnp-webpack-plugin@1.6.4:
   version "1.6.4"
   resolved "https://registry.yarnpkg.com/pnp-webpack-plugin/-/pnp-webpack-plugin-1.6.4.tgz#c9711ac4dc48a685dabafc86f8b6dd9f8df84149"
@@ -11721,6 +11726,14 @@ worker-farm@^1.7.0:
   integrity sha512-rvw3QTZc8lAxyVrqcSGVm5yP/IJ2UcB3U0graE3LCFoZ0Yn2x4EoVSqJKdB/T5M+FLcRPjz4TDacRf3OCfNUzw==
   dependencies:
     errno "~0.1.7"
+
+worker-loader@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/worker-loader/-/worker-loader-3.0.5.tgz#6e13a583c4120ba419eece8e4f2e098b014311bf"
+  integrity sha512-cOh4UqTtvT8eHpyuuTK2C66Fg/G5Pb7g11bwtKm7uyD0vj2hCGY1APlSzVD75V9ciYZt44VPbFPiSFTSLxkQ+w==
+  dependencies:
+    loader-utils "^2.0.0"
+    schema-utils "^3.0.0"
 
 worker-rpc@^0.1.0:
   version "0.1.1"
