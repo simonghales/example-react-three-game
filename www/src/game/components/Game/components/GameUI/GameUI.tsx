@@ -36,7 +36,7 @@ const GameUI: React.FC = () => {
 
     return (
         <StyledContainer>
-            <StyledAttackButton onMouseDown={onPunchMouseDown} onMouseUp={onPunchMouseUp}>
+            <StyledAttackButton onMouseDown={onPunchMouseDown} onMouseUp={onPunchMouseUp} onTouchStart={onPunchMouseDown} onTouchEnd={onPunchMouseUp}>
                 <GiPunch size={60}/>
             </StyledAttackButton>
         </StyledContainer>
