@@ -18,6 +18,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-full-screen": "^0.3.1",
+    "react-icons": "^3.11.0",
     "react-scripts": "4.0.0",
     "react-three-fiber": "^5.3.0",
     "styled-components": "^5.2.1",

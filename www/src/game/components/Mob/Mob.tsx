@@ -1,33 +1,71 @@
-import React from "react";
-import {Box} from "@react-three/drei";
-import {useBody} from "../../../physics/components/Physics/hooks";
-import {BodyShape, BodyType} from "../../../physics/bodies";
-import {Vec2} from "planck-js";
+import React, {useEffect, useRef, useState} from "react";
+import MobPhysics from "./components/MobPhysics/MobPhysics";
+import MobVisuals from "./components/MobVisuals/MobVisuals";
+import {Object3D} from "three";
+import MobTargetTracking from "./components/MobTargetTracking/MobTargetTracking";
+import {useProxy} from "valtio";
+import {playerTargets} from "../../../state/player";
+import {deleteMobHealthManager, getMobHealthManager, initMobHealthManager} from "../../../state/mobs";
+import MobUI from "./components/MobUI/MobUI";
 
-const color = "red"
+const useIsTargetted = (id: number): boolean => {
+    const targetID = useProxy(playerTargets).targetID
+    return targetID === id
+}
+
+const useIsDead = (id: number): boolean => {
+
+    const managerProxy = useProxy(getMobHealthManager(id))
+
+    return managerProxy.health <= 0
+
+}
+
+const mobID = 0 // todo - dynamic
+
+const MobInner: React.FC<{
+    id: number,
+}> = ({id}) => {
+
+    const localRef = useRef<Object3D>(new Object3D())
+    const isTargetted = useIsTargetted(id)
+    const isDead = useIsDead(id)
+
+    return (
+        <>
+            {
+                !isDead && (
+                    <MobPhysics id={mobID} localRef={localRef}/>
+                )
+            }
+            <MobVisuals isDead={isDead} localRef={localRef} id={id}/>
+            {
+                isTargetted && (
+                    <MobTargetTracking localRef={localRef}/>
+                )
+            }
+        </>
+    );
+};
 
 const Mob: React.FC = () => {
 
-    const x = 0
-    const y = 0
-    const size = 5
+    const id = mobID
 
-    const [ref, api] = useBody(() => ({
-        type: BodyType.static,
-        shape: BodyShape.box,
-        hx: size,
-        hy: size,
-        position: Vec2(x, y),
-        fixtureOptions: {
-            isSensor: false,
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        initMobHealthManager(id)
+        setMounted(true)
+
+        return () => {
+            deleteMobHealthManager(id)
         }
-    }))
+    })
 
-    return (
-        <Box ref={ref} args={[size, 2, size]} position={[x, 1, y]} castShadow receiveShadow onPointerDown={() => console.log('hello')}>
-            <meshToonMaterial attach="material" color={color}/>
-        </Box>
-    );
-};
+    if (!mounted) return null
+
+    return <MobInner id={id}/>
+}
 
 export default Mob;

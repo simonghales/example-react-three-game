@@ -1,9 +1,7 @@
 import React, {Suspense, useCallback, useEffect, useRef} from "react";
-import Male from "../../../3d/models/Character/Male";
 import {nippleManager} from "../Joystick/Joystick";
 import {useFrame} from "react-three-fiber";
 import {proxy, useProxy} from "valtio";
-import Warrior from "../../../3d/models/Warrior/Warrior";
 import {radians} from "../../../utils/angles";
 import {gameRefs} from "../../../state/refs";
 import {usePlayerCamera} from "./hooks/camera";
@@ -13,9 +11,10 @@ import {InputKeys, inputsState} from "../../../state/inputs";
 import {lerpRadians, numLerp, PI, PI_TIMES_TWO} from "../../../utils/numbers";
 import {DIAGONAL} from "../../../utils/common";
 import {devState} from "../../../state/dev";
-import {useBody} from "../../../physics/components/Physics/hooks";
-import {BodyShape, BodyType} from "../../../physics/bodies";
 import {Vec2} from "planck-js";
+import {usePlayerPhysics} from "./hooks/physics";
+import PlayerVisuals, {playerState} from "./components/PlayerVisuals/PlayerVisuals";
+import PlayerDebug from "./components/PlayerDebug/PlayerDebug";
 
 const nippleState = {
     active: false,
@@ -29,11 +28,6 @@ const playerVelocity = {
     targetAngle: 0,
 }
 
-const playerState = proxy({
-    moving: false,
-    running: false,
-})
-
 const WALKING_SPEED = 5
 const RUNNING_SPEED = WALKING_SPEED * 2
 
@@ -41,25 +35,9 @@ const tempVec2 = Vec2(0, 0)
 
 const Player: React.FC = () => {
 
-    const onCollideStart = useCallback(() => {
-        console.log('collide start')
-    }, [])
-
-    const onCollideEnd = useCallback(() => {
-        console.log('collide end')
-    }, [])
-
-    const [ref, api] = useBody(() => ({
-        type: BodyType.dynamic,
-        shape: BodyShape.circle,
-        radius: 0.75,
-        position: Vec2(0, 0),
-        fixtureOptions: {
-        }
-    }), onCollideStart, onCollideEnd)
+    const [ref, api, radiusRef, radiusApi] = usePlayerPhysics()
 
     usePlayerControls()
-    const localPlayerState = useProxy(playerState)
     const localDevState = useProxy(devState)
     const targetLocked = localDevState.targetLocked
 
@@ -104,8 +82,8 @@ const Player: React.FC = () => {
 
         const {x, z: y} = ref.current.position
 
-        playerPosition.x = x
-        playerPosition.y = y
+        tempVec2.set(x, y)
+        radiusApi.setPosition(tempVec2)
 
         let xVel = numLerp(playerVelocity.previousX, playerVelocity.x, 0.75)
         let yVel = numLerp(playerVelocity.previousY, playerVelocity.y, 0.75)
@@ -134,16 +112,14 @@ const Player: React.FC = () => {
 
             const adjustedXVel = xVel * speed
             const adjustedYVel = yVel * speed
+
             tempVec2.set(adjustedXVel, adjustedYVel)
             api.setLinearVelocity(tempVec2)
-
-            // newX = x + delta * xVel * speed
-            // newY = y + delta * yVel * speed
-            // ref.current.position.x = newX
-            // ref.current.position.z = newY
+            radiusApi.setLinearVelocity(tempVec2)
         } else {
             tempVec2.set(0, 0)
             api.setLinearVelocity(tempVec2)
+            radiusApi.setLinearVelocity(tempVec2)
         }
 
         let prevAngle = ref.current.rotation.y // convert to low equivalent angle
@@ -181,16 +157,21 @@ const Player: React.FC = () => {
             playerState.running = isRunning
         }
 
+        playerPosition.x = x
+        playerPosition.y = y
+        playerPosition.angle = ref.current.rotation.y
+
         gl.render(scene, camera)
 
     }, 100)
 
     return (
-        <group position={[0, 0, 0]} ref={ref}>
-            <Suspense fallback={null}>
-                <Warrior moving={localPlayerState.moving} running={localPlayerState.running}/>
-            </Suspense>
-        </group>
+        <>
+            <group position={[0, 0, 0]} ref={ref}>
+                <PlayerVisuals/>
+            </group>
+            <PlayerDebug radiusRef={radiusRef}/>
+        </>
     );
 };
 

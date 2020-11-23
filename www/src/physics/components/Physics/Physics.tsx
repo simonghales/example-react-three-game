@@ -1,6 +1,6 @@
 import React, {ReactElement, useEffect} from "react";
 import {gamePhysicsWorker} from "./worker";
-import {buffers, storedPhysicsData} from "../../data";
+import {buffers, handleBeginCollision, handleEndCollision, storedPhysicsData} from "../../data";
 import {WorkerMessageType, WorkerOwnerMessageType} from "../../../workers/physics/types";
 
 const Physics: React.FC = ({children}) => {
@@ -41,6 +41,12 @@ const Physics: React.FC = ({children}) => {
                         }),
                         {}
                     )
+                    break
+                case WorkerOwnerMessageType.BEGIN_COLLISION:
+                    handleBeginCollision(event.data.props as any)
+                    break
+                case WorkerOwnerMessageType.END_COLLISION:
+                    handleEndCollision(event.data.props as any)
                     break
             }
 

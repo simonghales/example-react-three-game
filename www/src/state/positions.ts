@@ -5,6 +5,7 @@ export const playerPosition = {
     previousY: 0,
     targetX: 0,
     targetY: 0,
+    angle: 0,
 }
 
 export const cameraPosition = {

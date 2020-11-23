@@ -10,12 +10,31 @@ export const buffers = {
 }
 
 export const collisionStartedEvents: {
-    [key: string]: () => void,
+    [key: string]: (data: any) => void,
 } = {}
 
 export const collisionEndedEvents: {
-    [key: string]: () => void,
+    [key: string]: (data: any) => void,
 } = {}
+
+export type CollisionEventProps = {
+    uuid: string,
+    data: {
+        uuid: string,
+    }
+}
+
+export const handleBeginCollision = (data: CollisionEventProps) => {
+    if (collisionStartedEvents[data.uuid]) {
+        collisionStartedEvents[data.uuid](data.data)
+    }
+}
+
+export const handleEndCollision = (data: CollisionEventProps) => {
+    if (collisionEndedEvents[data.uuid]) {
+        collisionEndedEvents[data.uuid](data.data)
+    }
+}
 
 export const storedPhysicsData: {
     bodies: {
@@ -25,14 +44,19 @@ export const storedPhysicsData: {
     bodies: {},
 }
 
-export const applyPositionAngle = (object: Object3D | null, index: number, applyAngle: boolean = false) => {
+export const applyPositionAngle = (object: Object3D | null, index: number, applyAngle: boolean = false, debug?: string) => {
     if (index !== undefined && buffers.positions.length && !!object) {
         const start = index * 2
         const position = buffers.positions.slice(start, start + 2)
         object.position.x = position[0]
         object.position.z = position[1]
+        if (debug) {
+            // console.log('debug', debug, position)
+        }
         if (applyAngle) {
             object.rotation.y = buffers.angles[index]
         }
+    } else {
+        // console.warn('no match?')
     }
 }

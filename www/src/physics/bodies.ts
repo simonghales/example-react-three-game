@@ -53,6 +53,7 @@ export const addBody = ({uuid, listenForCollisions, shape, fixtureOptions = {}, 
         fixedRotation: true,
         ...props,
     }
+
     const {type} = bodyDef
 
     const body = planckWorld.createBody(bodyDef)
@@ -95,6 +96,25 @@ export const addBody = ({uuid, listenForCollisions, shape, fixtureOptions = {}, 
 
     return body
 
+}
+
+export type RemoveBodyProps = {
+    uuid: string,
+}
+
+export const removeBody = ({uuid}: RemoveBodyProps) => {
+    const index = dynamicBodiesUuids.indexOf(uuid)
+    if (index > -1) {
+        dynamicBodiesUuids.splice(index, 1)
+        syncBodies()
+    }
+    const body = existingBodies.get(uuid)
+    if (!body) {
+        console.warn(`Body not found for ${uuid}`)
+        return
+    }
+    existingBodies.delete(uuid)
+    planckWorld.destroyBody(body)
 }
 
 export type SetBodyProps = {

@@ -8,9 +8,11 @@ import Joystick from "../Joystick/Joystick";
 import {FullScreen, useFullScreenHandle} from "react-full-screen";
 import Lights from "../Lights/Lights";
 import Camera from "../Camera/Camera";
-import Mob from "../Mob/Mob";
 import DevMenu from "../DevMenu/DevMenu";
 import Physics from "../../../physics/components/Physics/Physics";
+import Mob from "../Mob/Mob";
+import GameUI from "./components/GameUI/GameUI";
+import AttackColliders from "./components/AttackColliders/AttackColliders";
 
 const StyledContainer = styled.div`
     position: fixed;
@@ -32,11 +34,14 @@ const Game: React.FC = () => {
                         <Lights/>
                         <Floor/>
                         <Player/>
+                        {/*<OldMob/>*/}
                         <Mob/>
+                        <AttackColliders/>
                         <Stats/>
                     </Physics>
                 </Canvas>
                 <Joystick/>
+                <GameUI/>
                 <DevMenu onFullscreen={enter}/>
             </StyledContainer>
         </FullScreen>

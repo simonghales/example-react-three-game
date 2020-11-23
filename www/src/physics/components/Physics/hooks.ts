@@ -1,7 +1,7 @@
 import {Object3D} from "three";
-import {useLayoutEffect, useMemo, useRef} from "react";
+import {MutableRefObject, useLayoutEffect, useMemo, useRef, useState} from "react";
 import {workerAddBody, workerRemoveBody, workerSetBody} from "./worker";
-import {AddBodyDef} from "../../bodies";
+import {AddBodyDef, BodyType} from "../../bodies";
 import {Vec2} from "planck-js";
 import {useFrame} from "react-three-fiber";
 import {applyPositionAngle, buffers, collisionEndedEvents, collisionStartedEvents, storedPhysicsData} from "../../data";
@@ -11,19 +11,41 @@ export type BodyApi = {
     setLinearVelocity: (vec: Vec2) => void
 }
 
-export const useBody = (propsFn: () => AddBodyDef, onCollideStart?: () => void, onCollideEnd?: () => void): [any, BodyApi] => {
+export const useBody = (propsFn: () => AddBodyDef, {
+    uuid: passedUUID,
+    fwdRef,
+    onCollideEnd,
+    onCollideStart,
+    debug
+}: {
+    uuid?: string,
+    fwdRef?: MutableRefObject<Object3D>,
+    onCollideStart?: (data: any) => void,
+    onCollideEnd?: (data: any) => void,
+    debug?: string
+}): [any, BodyApi] => {
     const localRef = useRef<Object3D>((null as unknown) as Object3D)
-    let ref = localRef
-
-    useLayoutEffect(() => {
-
+    const ref = fwdRef ? fwdRef : localRef
+    const [uuid] = useState(() => {
+        if (passedUUID) return passedUUID
         if (!ref.current) {
             ref.current = new Object3D()
         }
+        return ref.current.uuid
+    })
+    const [isDynamic] = useState(() => {
+        const props = propsFn()
+        return props.type !== BodyType.static
+    })
 
-        const object = ref.current
-        const uuid = object.uuid
-        const listenForCollisions = !!onCollideStart && !!onCollideEnd
+    useLayoutEffect(() => {
+
+        const props = propsFn()
+
+        ref.current.position.x = props.position?.x || 0
+        ref.current.position.z = props.position?.y || 0
+
+        const listenForCollisions = !!onCollideStart || !!onCollideEnd
 
         if (listenForCollisions) {
             collisionStartedEvents[uuid] = onCollideStart ? onCollideStart : () => {}
@@ -33,7 +55,7 @@ export const useBody = (propsFn: () => AddBodyDef, onCollideStart?: () => void, 
         workerAddBody({
             uuid,
             listenForCollisions,
-            ...propsFn(),
+            ...props,
         })
 
         return () => {
@@ -49,15 +71,18 @@ export const useBody = (propsFn: () => AddBodyDef, onCollideStart?: () => void, 
     }, [])
 
     useFrame(() => {
+        if (!isDynamic) {
+            return
+        }
         if (ref.current && buffers.positions.length && buffers.angles.length) {
-            const index = storedPhysicsData.bodies[ref.current.uuid]
-            applyPositionAngle(ref.current, index)
+            const index = storedPhysicsData.bodies[uuid]
+            applyPositionAngle(ref.current, index, false, debug)
         }
     })
 
     const api = useMemo<BodyApi>(() => {
 
-        const getUUID = () => ref.current.uuid
+        const getUUID = () => uuid
 
         return  {
             setPosition: (vec) => {

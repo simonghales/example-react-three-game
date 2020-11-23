@@ -1,9 +1,14 @@
 
+export const RAW_INPUTS = {
+    punch: false,
+}
+
 export type InputState = {
     keys: number[],
     active: boolean,
     pressed: boolean,
     released: boolean,
+    raw?: boolean,
 }
 
 export enum InputKeys {
@@ -11,10 +16,18 @@ export enum InputKeys {
     LEFT,
     UP,
     DOWN,
-    SHIFT
+    SHIFT,
+    PUNCH
 }
 
 export const inputsState: Record<InputKeys, InputState> = {
+    [InputKeys.PUNCH]: {
+        keys: [32],
+        active: false,
+        pressed: false,
+        released: false,
+        raw: false,
+    },
     [InputKeys.RIGHT]: {
         keys: [68, 39],
         active: false,
