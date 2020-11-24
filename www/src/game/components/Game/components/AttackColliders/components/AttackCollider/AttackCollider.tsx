@@ -6,6 +6,7 @@ import {BodyShape, BodyType} from "../../../../../../../physics/bodies";
 import {Vec2} from "planck-js";
 import {COLLISION_FILTER_GROUPS} from "../../../../../../../physics/collisions/filters";
 import {getMobHealthManager} from "../../../../../../../state/mobs";
+import {PhysicsCacheKeys} from "../../../../../../../physics/cache";
 
 const tempVec2 = Vec2(0, 0)
 
@@ -48,6 +49,7 @@ const AttackCollider: React.FC<{
         }
     }), {
         onCollideStart,
+        cacheKey: PhysicsCacheKeys.PUNCH,
     })
 
     useEffect(() => {

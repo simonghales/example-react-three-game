@@ -4,7 +4,8 @@ import {workerAddBody, workerRemoveBody, workerSetBody} from "./worker";
 import {AddBodyDef, BodyType} from "../../bodies";
 import {Vec2} from "planck-js";
 import {useFrame} from "react-three-fiber";
-import {applyPositionAngle, buffers, collisionEndedEvents, collisionStartedEvents, storedPhysicsData} from "../../data";
+import {applyPositionAngle, buffers, collisionEndedEvents, collisionStartedEvents, storedPhysicsData} from "./data";
+import {PhysicsCacheKeys} from "../../cache";
 
 export type BodyApi = {
     setPosition: (vec: Vec2) => void,
@@ -12,12 +13,14 @@ export type BodyApi = {
 }
 
 export const useBody = (propsFn: () => AddBodyDef, {
+    cacheKey,
     uuid: passedUUID,
     fwdRef,
     onCollideEnd,
     onCollideStart,
     debug
 }: {
+    cacheKey?: PhysicsCacheKeys,
     uuid?: string,
     fwdRef?: MutableRefObject<Object3D>,
     onCollideStart?: (data: any) => void,
@@ -55,6 +58,7 @@ export const useBody = (propsFn: () => AddBodyDef, {
         workerAddBody({
             uuid,
             listenForCollisions,
+            cacheKey,
             ...props,
         })
 
@@ -65,7 +69,7 @@ export const useBody = (propsFn: () => AddBodyDef, {
                 delete collisionEndedEvents[uuid]
             }
 
-            workerRemoveBody(uuid)
+            workerRemoveBody({uuid, cacheKey})
         }
 
     }, [])

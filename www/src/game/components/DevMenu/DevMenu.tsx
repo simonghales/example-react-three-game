@@ -25,9 +25,6 @@ const DevMenu: React.FC<{
                     FULLSCREEN
                 </StyledFullscreen>
             </div>
-            <div>
-                <button onClick={() => devState.targetLocked = !localDevState.targetLocked}>Toggle target locked</button>
-            </div>
         </StyledContainer>
     );
 };

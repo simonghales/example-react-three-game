@@ -15,6 +15,8 @@ import {
     SkinnedMesh
 } from "three";
 import {hexStringToCode} from "../../../utils/color";
+import {SkeletonUtils} from "three/examples/jsm/utils/SkeletonUtils";
+import {setMaterials, setShadows} from "../../../utils/models";
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -51,7 +53,15 @@ export default function Demon({isDead, ...props}: JSX.IntrinsicElements['group']
     isDead: boolean,
 }) {
     const group = useRef<THREE.Group>()
-    const {nodes, materials, animations} = useGLTF('/Demon.glb') as GLTFResult
+    const {nodes, materials, animations, scene} = useGLTF('/Demon.glb') as GLTFResult
+    const [geometry]: any = useState(() => {
+        const clonedScene = SkeletonUtils.clone(scene)
+        setMaterials(clonedScene, {
+            Texture: lightOrangeIndividualMaterial
+        })
+        setShadows(clonedScene)
+        return clonedScene
+    })
 
     const actions = useRef<GLTFActions>()
     const [mixer] = useState(() => new AnimationMixer(nodes.Demon001))
@@ -85,10 +95,7 @@ export default function Demon({isDead, ...props}: JSX.IntrinsicElements['group']
 
     return (
         <group ref={group} {...props} dispose={null}>
-            <primitive object={nodes.Body}/>
-            <primitive object={nodes.Head}/>
-            <skinnedMesh material={lightOrangeIndividualMaterial} geometry={nodes.Demon001.geometry}
-                         skeleton={nodes.Demon001.skeleton} receiveShadow castShadow/>
+            <primitive object={geometry} dispose={null} />
         </group>
     )
 }

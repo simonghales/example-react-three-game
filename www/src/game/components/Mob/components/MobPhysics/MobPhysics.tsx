@@ -7,16 +7,16 @@ import {COLLISION_FILTER_GROUPS} from "../../../../../physics/collisions/filters
 import {useFrame} from "react-three-fiber";
 
 const MobPhysics: React.FC<{
+    x: number,
+    y: number,
     id: number,
     localRef: MutableRefObject<Object3D>,
-}> = ({id, localRef}) => {
+}> = ({x, y, id, localRef}) => {
 
-    const x = 5
-    const y = 5
     const size = 0.75
 
     const [ref, api] = useBody(() => ({
-        type: BodyType.dynamic,
+        type: BodyType.static,
         shape: BodyShape.circle,
         radius: size,
         position: Vec2(x, y),

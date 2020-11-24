@@ -1,7 +1,7 @@
-import React, {useEffect, useLayoutEffect, useRef} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useFrame, useResource, useThree} from "react-three-fiber";
 import {gameRefs} from "../../../state/refs";
-import {Vector3} from "three";
+import {Object3D, Vector3} from "three";
 import {cameraPosition, playerPosition} from "../../../state/positions";
 import {numLerp} from "../../../utils/numbers";
 import {useProxy} from "valtio";
@@ -17,7 +17,6 @@ const data = {
 }
 
 const Camera: React.FC = () => {
-
     const lightRef: any = useResource()
     const ref = useRef<any>()
     const {setDefaultCamera} = useThree()
@@ -29,6 +28,17 @@ const Camera: React.FC = () => {
 
     useEffect(() => {
         ref.current.lookAt(0, 2, 0)
+
+        if (!ref.current) return
+        if (!lightRef.current) return
+        const light = lightRef.current
+        const camera = ref.current
+
+        light.target.position.x = camera.position.x
+        light.target.position.y = camera.position.y
+        light.target.position.z = camera.position.z
+        light.target.updateMatrixWorld()
+
     }, [])
 
     useFrame(() => {
@@ -119,9 +129,9 @@ const Camera: React.FC = () => {
                 position={[20, 10, 30]}
                 shadow-mapSize-width={2048}
                 shadow-mapSize-height={2048}
-                shadowCameraLeft={-20}
-                shadowCameraRight={20}
-                shadowCameraTop={10}
+                shadowCameraLeft={0}
+                shadowCameraRight={40}
+                shadowCameraTop={20}
                 shadowCameraBottom={-20}
                 shadowCameraNear={5}
                 shadowCameraFar={300}

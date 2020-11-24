@@ -21,11 +21,11 @@ const useIsDead = (id: number): boolean => {
 
 }
 
-const mobID = 0 // todo - dynamic
-
 const MobInner: React.FC<{
     id: number,
-}> = ({id}) => {
+    x: number,
+    y: number,
+}> = ({id, x, y}) => {
 
     const localRef = useRef<Object3D>(new Object3D())
     const isTargetted = useIsTargetted(id)
@@ -35,10 +35,10 @@ const MobInner: React.FC<{
         <>
             {
                 !isDead && (
-                    <MobPhysics id={mobID} localRef={localRef}/>
+                    <MobPhysics x={x} y={y} id={id} localRef={localRef}/>
                 )
             }
-            <MobVisuals isDead={isDead} localRef={localRef} id={id}/>
+            <MobVisuals x={x} y={y} isDead={isDead} localRef={localRef} id={id}/>
             {
                 isTargetted && (
                     <MobTargetTracking localRef={localRef}/>
@@ -48,9 +48,11 @@ const MobInner: React.FC<{
     );
 };
 
-const Mob: React.FC = () => {
-
-    const id = mobID
+const Mob: React.FC<{
+    id: number,
+    x: number,
+    y: number,
+}> = ({id, x, y}) => {
 
     const [mounted, setMounted] = useState(false)
 
@@ -65,7 +67,7 @@ const Mob: React.FC = () => {
 
     if (!mounted) return null
 
-    return <MobInner id={id}/>
+    return <MobInner id={id} x={x} y={y}/>
 }
 
 export default Mob;

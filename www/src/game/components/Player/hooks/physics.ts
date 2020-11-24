@@ -5,7 +5,7 @@ import {useCallback} from "react";
 import {useFrame} from "react-three-fiber";
 import {COLLISION_FILTER_GROUPS} from "../../../../physics/collisions/filters";
 import {devState} from "../../../../state/dev";
-import {playerTargets} from "../../../../state/player";
+import {playerTargets, removePlayerTarget} from "../../../../state/player";
 
 const tempVec2 = Vec2(0, 0)
 
@@ -21,12 +21,11 @@ export const usePlayerPhysics = () => {
 
     const onRadiusCollideStart = useCallback((data: any) => {
         const mobID = data.mobID
-        playerTargets.targetID = mobID
-        devState.targetLocked = true
+        playerTargets.inRange.push(mobID)
     }, [])
 
-    const onRadiusCollideEnd = useCallback(() => {
-        devState.targetLocked = false
+    const onRadiusCollideEnd = useCallback(({mobID}: {mobID: number}) => {
+        removePlayerTarget(mobID)
     }, [])
 
     const [ref, api] = useBody(() => ({

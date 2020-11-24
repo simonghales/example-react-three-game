@@ -8,10 +8,12 @@ import {lerpRadians, PI, PI_TIMES_TWO} from "../../../../../utils/numbers";
 import MobUI from "../MobUI/MobUI";
 
 const MobVisuals: React.FC<{
+    x: number,
+    y: number,
     localRef: MutableRefObject<Object3D>,
     isDead: boolean,
     id: number,
-}> = ({localRef, isDead, id}) => {
+}> = ({localRef, x, y, isDead, id}) => {
 
     useFrame((state, delta) => {
         if (isDead) return
@@ -30,7 +32,7 @@ const MobVisuals: React.FC<{
     })
 
     return (
-        <group ref={localRef}>
+        <group ref={localRef} position={[x, 0, y]}>
             <Suspense fallback={null}>
                 <Demon isDead={isDead} position={[0, isDead ? 0 : 1, 0]}/>
             </Suspense>

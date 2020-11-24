@@ -35,7 +35,12 @@ const Game: React.FC = () => {
                         <Floor/>
                         <Player/>
                         {/*<OldMob/>*/}
-                        <Mob/>
+                        <Mob id={0} x={5} y={5}/>
+                        <Mob id={1} x={10} y={5}/>
+                        <Mob id={2} x={0} y={5}/>
+                        <Mob id={3} x={5} y={10}/>
+                        <Mob id={4} x={0} y={10}/>
+                        <Mob id={5} x={10} y={10}/>
                         <AttackColliders/>
                         <Stats/>
                     </Physics>
