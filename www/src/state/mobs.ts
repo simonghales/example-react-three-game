@@ -4,7 +4,7 @@ export type MobHealth = {
     health: number,
 }
 
-const mobsHealthManager: {
+export const mobsHealthManager: {
     [id: number]: MobHealth,
 } = {}
 

@@ -34,7 +34,8 @@ const AttackCollider: React.FC<{
     }) => {
         const manager = getMobHealthManager(mobID)
         if (!manager) return
-        manager.health -= 25
+        manager.health = manager.health - 25
+        console.log('attack collision?', mobID, manager.health)
     }, [])
 
     const [ref, api] = useBody(() => ({

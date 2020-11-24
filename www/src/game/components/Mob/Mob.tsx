@@ -6,7 +6,6 @@ import MobTargetTracking from "./components/MobTargetTracking/MobTargetTracking"
 import {useProxy} from "valtio";
 import {playerTargets} from "../../../state/player";
 import {deleteMobHealthManager, getMobHealthManager, initMobHealthManager} from "../../../state/mobs";
-import MobUI from "./components/MobUI/MobUI";
 
 const useIsTargetted = (id: number): boolean => {
     const targetID = useProxy(playerTargets).targetID
@@ -16,7 +15,6 @@ const useIsTargetted = (id: number): boolean => {
 const useIsDead = (id: number): boolean => {
 
     const managerProxy = useProxy(getMobHealthManager(id))
-
     return managerProxy.health <= 0
 
 }
@@ -63,7 +61,7 @@ const Mob: React.FC<{
         return () => {
             deleteMobHealthManager(id)
         }
-    })
+    }, [])
 
     if (!mounted) return null
 

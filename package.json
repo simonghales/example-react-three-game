@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "valtio": "^0.4.1"
+  }
+}
