@@ -15,7 +15,8 @@ export const usePlayerTarget = (): number | null => {
     if (lastAttacked && targets.includes(lastAttacked)) {
         return lastAttacked
     }
-    return targets.length > 0 ? targets[0] : null
+    return null
+    // return targets.length > 0 ? targets[0] : null
 }
 
 export const usePlayerHasTarget = (): boolean => {
