@@ -23,7 +23,7 @@ const useAllowedMovementOffset = (): [number, number] => {
     if (width > height) {
         return [5, 3]
     }
-    return [2, 3]
+    return [1.5, 3]
 }
 
 const Camera: React.FC = () => {
