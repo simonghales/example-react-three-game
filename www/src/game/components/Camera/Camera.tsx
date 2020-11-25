@@ -1,4 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
+import {useWindowSize} from "@react-hook/window-size";
 import {useFrame, useResource, useThree} from "react-three-fiber";
 import {gameRefs} from "../../../state/refs";
 import {Object3D, Vector3} from "three";
@@ -17,6 +18,14 @@ const data = {
     previousYDiff: 0,
 }
 
+const useAllowedMovementOffset = (): [number, number] => {
+    const [width, height] = useWindowSize()
+    if (width > height) {
+        return [5, 3]
+    }
+    return [2, 3]
+}
+
 const Camera: React.FC = () => {
     const lightRef: any = useResource()
     const ref = useRef<any>()
@@ -24,6 +33,7 @@ const Camera: React.FC = () => {
     const localDevState = useProxy(devState)
     const targetLocked = usePlayerHasTarget()
     const inDanger = localDevState.inDanger
+    const [allowedX, allowedY] = useAllowedMovementOffset()
 
     useEffect(() => void setDefaultCamera(ref.current), [])
 
@@ -65,7 +75,7 @@ const Camera: React.FC = () => {
         const cameraXDiff = x - playerPosition.x
         const cameraYDiff = (y - playerPosition.y) + cameraYOffset
 
-        let movedSufficiently = inDanger || !data.atRest || (Math.abs(cameraXDiff) > 6 || Math.abs(cameraYDiff) > 3) || (Math.abs(playerXDiff) > 500 || Math.abs(playerYDiff) > 500)
+        let movedSufficiently = inDanger || !data.atRest || (Math.abs(cameraXDiff) > allowedX || Math.abs(cameraYDiff) > allowedY) || (Math.abs(playerXDiff) > 500 || Math.abs(playerYDiff) > 500)
 
         if (movedSufficiently) {
 
