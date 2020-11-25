@@ -6,6 +6,7 @@ import {useFrame} from "react-three-fiber";
 import {playerPosition} from "../../../../../state/positions";
 import {lerpRadians, PI, PI_TIMES_TWO} from "../../../../../utils/numbers";
 import MobUI from "../MobUI/MobUI";
+import {Cylinder} from "@react-three/drei";
 
 const MobVisuals: React.FC<{
     x: number,
@@ -13,7 +14,8 @@ const MobVisuals: React.FC<{
     localRef: MutableRefObject<Object3D>,
     isDead: boolean,
     id: number,
-}> = ({localRef, x, y, isDead, id}) => {
+    targeted: boolean,
+}> = ({localRef, x, y, isDead, id, targeted}) => {
 
     useFrame((state, delta) => {
         if (isDead) return
@@ -34,9 +36,17 @@ const MobVisuals: React.FC<{
     return (
         <group ref={localRef} position={[x, 0, y]}>
             <Suspense fallback={null}>
-                <Demon isDead={isDead} position={[0, isDead ? 0 : 1, 0]}/>
+                <Demon isDead={isDead} position={[0, isDead ? 0 : 1, 0]} onClick={() => console.log('clicked on mesh')}/>
             </Suspense>
             <MobUI id={id}/>
+            {
+                targeted && (
+                    <Cylinder>
+                        <meshBasicMaterial attach="material" color={"red"} transparent
+                                           opacity={0.25}/>
+                    </Cylinder>
+                )
+            }
         </group>
     );
 };

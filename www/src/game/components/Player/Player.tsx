@@ -15,6 +15,7 @@ import {Vec2} from "planck-js";
 import {usePlayerPhysics} from "./hooks/physics";
 import PlayerVisuals, {playerState} from "./components/PlayerVisuals/PlayerVisuals";
 import PlayerDebug from "./components/PlayerDebug/PlayerDebug";
+import {usePlayerHasTarget} from "../../../state/player";
 
 const nippleState = {
     active: false,
@@ -38,8 +39,7 @@ const Player: React.FC = () => {
     const [ref, api, radiusRef, radiusApi] = usePlayerPhysics()
 
     usePlayerControls()
-    const localDevState = useProxy(devState)
-    const targetLocked = localDevState.targetLocked
+    const targetLocked = usePlayerHasTarget()
 
     useEffect(() => {
         gameRefs.player = ref.current
@@ -63,6 +63,11 @@ const Player: React.FC = () => {
             const {x, y} = data.vector
             playerVelocity.previousX = playerVelocity.x
             playerVelocity.previousY = playerVelocity.y
+            if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
+                playerVelocity.x = 0
+                playerVelocity.y = 0
+                return
+            }
             playerVelocity.x = x * -1
             playerVelocity.y = y
         })

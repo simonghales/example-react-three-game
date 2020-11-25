@@ -4,11 +4,11 @@ import MobVisuals from "./components/MobVisuals/MobVisuals";
 import {Object3D} from "three";
 import MobTargetTracking from "./components/MobTargetTracking/MobTargetTracking";
 import {useProxy} from "valtio";
-import {playerTargets} from "../../../state/player";
+import {usePlayerTarget} from "../../../state/player";
 import {deleteMobHealthManager, getMobHealthManager, initMobHealthManager} from "../../../state/mobs";
 
-const useIsTargetted = (id: number): boolean => {
-    const targetID = useProxy(playerTargets).targetID
+const useIsTargeted = (id: number): boolean => {
+    const targetID = usePlayerTarget()
     return targetID === id
 }
 
@@ -26,7 +26,7 @@ const MobInner: React.FC<{
 }> = ({id, x, y}) => {
 
     const localRef = useRef<Object3D>(new Object3D())
-    const isTargetted = useIsTargetted(id)
+    const isTargeted = useIsTargeted(id)
     const isDead = useIsDead(id)
 
     return (
@@ -36,9 +36,9 @@ const MobInner: React.FC<{
                     <MobPhysics x={x} y={y} id={id} localRef={localRef}/>
                 )
             }
-            <MobVisuals x={x} y={y} isDead={isDead} localRef={localRef} id={id}/>
+            <MobVisuals x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
             {
-                isTargetted && (
+                isTargeted && (
                     <MobTargetTracking localRef={localRef}/>
                 )
             }

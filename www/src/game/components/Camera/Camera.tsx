@@ -6,6 +6,7 @@ import {cameraPosition, playerPosition} from "../../../state/positions";
 import {numLerp} from "../../../utils/numbers";
 import {useProxy} from "valtio";
 import {devState} from "../../../state/dev";
+import {usePlayerHasTarget} from "../../../state/player";
 
 const cameraYOffset = 15
 
@@ -21,7 +22,7 @@ const Camera: React.FC = () => {
     const ref = useRef<any>()
     const {setDefaultCamera} = useThree()
     const localDevState = useProxy(devState)
-    const targetLocked = localDevState.targetLocked
+    const targetLocked = usePlayerHasTarget()
     const inDanger = localDevState.inDanger
 
     useEffect(() => void setDefaultCamera(ref.current), [])

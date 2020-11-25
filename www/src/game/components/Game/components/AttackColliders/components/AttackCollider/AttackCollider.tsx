@@ -7,6 +7,7 @@ import {Vec2} from "planck-js";
 import {COLLISION_FILTER_GROUPS} from "../../../../../../../physics/collisions/filters";
 import {getMobHealthManager} from "../../../../../../../state/mobs";
 import {PhysicsCacheKeys} from "../../../../../../../physics/cache";
+import {playerTargets} from "../../../../../../../state/player";
 
 const tempVec2 = Vec2(0, 0)
 
@@ -32,10 +33,10 @@ const AttackCollider: React.FC<{
     const onCollideStart = useCallback(({mobID}: {
         mobID: number,
     }) => {
+        playerTargets.lastAttacked = mobID
         const manager = getMobHealthManager(mobID)
         if (!manager) return
         manager.health = manager.health - 25
-        console.log('attack collision?', mobID, manager.health)
     }, [])
 
     const [ref, api] = useBody(() => ({

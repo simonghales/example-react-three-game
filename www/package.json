@@ -13,7 +13,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/styled-components": "^5.1.4",
     "hotkeys-js": "^3.8.1",
-    "nipplejs": "^0.8.7",
+    "nipplejs": "simonghales/nipplejs",
     "planck-js": "^0.3.22",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

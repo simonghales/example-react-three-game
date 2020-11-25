@@ -4,15 +4,20 @@ import styled from "styled-components";
 
 const StyledContainer = styled.div`
     position: absolute;
-    top: 50px;
+    top: 0;
     left: 0;
     right: 0;
-    bottom: 50px;
+    bottom: 0;
+    
+    .nipple {
+      pointer-events: none;
+    }
+    
 `;
 
 export let nippleManager: JoystickManager;
 
-const Joystick: React.FC = () => {
+const Joystick: React.FC = ({children}) => {
 
     const ref = useRef<any>()
 
@@ -25,7 +30,9 @@ const Joystick: React.FC = () => {
     }, [])
 
     return (
-        <StyledContainer ref={ref}></StyledContainer>
+        <StyledContainer ref={ref} onMouseDown={() => console.log('mouse down')}>
+            {children}
+        </StyledContainer>
     );
 };
 
