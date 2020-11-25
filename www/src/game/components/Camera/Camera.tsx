@@ -8,8 +8,7 @@ import {numLerp} from "../../../utils/numbers";
 import {useProxy} from "valtio";
 import {devState} from "../../../state/dev";
 import {usePlayerHasTarget} from "../../../state/player";
-
-const cameraYOffset = 15
+import {useIsPortrait} from "../../../utils/responsive";
 
 const data = {
     atRest: true,
@@ -19,11 +18,13 @@ const data = {
 }
 
 const useAllowedMovementOffset = (): [number, number] => {
-    const [width, height] = useWindowSize()
-    if (width > height) {
-        return [5, 3]
-    }
-    return [1.5, 3]
+    const portrait = useIsPortrait()
+    return portrait ? [1.5, 3] : [5, 3]
+}
+
+const useCameraOffset = (): [number, number] => {
+    const portrait = useIsPortrait()
+    return portrait ? [30, 25] : [15, 15]
 }
 
 const Camera: React.FC = () => {
@@ -34,6 +35,7 @@ const Camera: React.FC = () => {
     const targetLocked = usePlayerHasTarget()
     const inDanger = localDevState.inDanger
     const [allowedX, allowedY] = useAllowedMovementOffset()
+    const [cameraYOffset, cameraZOffset] = useCameraOffset()
 
     useEffect(() => void setDefaultCamera(ref.current), [])
 
@@ -73,7 +75,7 @@ const Camera: React.FC = () => {
         const moving = playerYDiff !== 0 || playerXDiff !== 0
 
         const cameraXDiff = x - playerPosition.x
-        const cameraYDiff = (y - playerPosition.y) + cameraYOffset
+        const cameraYDiff = (y - playerPosition.y) + cameraZOffset
 
         let movedSufficiently = inDanger || !data.atRest || (Math.abs(cameraXDiff) > allowedX || Math.abs(cameraYDiff) > allowedY) || (Math.abs(playerXDiff) > 500 || Math.abs(playerYDiff) > 500)
 
@@ -90,13 +92,13 @@ const Camera: React.FC = () => {
             data.previousYDiff = adjustedYDiff
 
             newX = playerPosition.x + (adjustedXDiff * 0.01)
-            newY = playerPosition.y + (adjustedYDiff * 0.01) - cameraYOffset
+            newY = playerPosition.y + (adjustedYDiff * 0.01) - cameraZOffset
         }
 
         if (isTargetLocked) {
 
             newX = numLerp(newX, playerPosition.targetX, 0.33)
-            newY = numLerp(newY, playerPosition.targetY - cameraYOffset, 0.33)
+            newY = numLerp(newY, playerPosition.targetY - cameraZOffset, 0.33)
 
         }
 
@@ -133,7 +135,7 @@ const Camera: React.FC = () => {
     })
 
     return (
-        <perspectiveCamera ref={ref} fov={35} position={[0, 15, -15]} near={5} far={100}>
+        <perspectiveCamera ref={ref} fov={35} position={[0, cameraYOffset, -cameraZOffset]} near={5} far={100}>
             <directionalLight
                 ref={lightRef}
                 intensity={0.6}
