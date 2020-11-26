@@ -7,7 +7,7 @@ import {cameraPosition, playerPosition} from "../../../state/positions";
 import {numLerp} from "../../../utils/numbers";
 import {useProxy} from "valtio";
 import {devState} from "../../../state/dev";
-import {usePlayerHasTarget} from "../../../state/player";
+import {useEnemiesInRange, usePlayerHasTarget} from "../../../state/player";
 import {useIsPortrait} from "../../../utils/responsive";
 
 const data = {
@@ -31,9 +31,8 @@ const Camera: React.FC = () => {
     const lightRef: any = useResource()
     const ref = useRef<any>()
     const {setDefaultCamera} = useThree()
-    const localDevState = useProxy(devState)
     const targetLocked = usePlayerHasTarget()
-    const inDanger = localDevState.inDanger
+    const inDanger = useEnemiesInRange()
     const [allowedX, allowedY] = useAllowedMovementOffset()
     const [cameraYOffset, cameraZOffset] = useCameraOffset()
 

@@ -37,6 +37,7 @@ const AttackCollider: React.FC<{
         const manager = getMobHealthManager(mobID)
         if (!manager) return
         manager.health = manager.health - 25
+        manager.lastHit = Date.now()
     }, [])
 
     const [ref, api] = useBody(() => ({
@@ -73,6 +74,8 @@ const AttackCollider: React.FC<{
         }
 
     }, [id, expires])
+
+    return null
 
     return (
         <group ref={ref} position={[x, 0, y]}>

@@ -9,13 +9,14 @@ import MobUI from "../MobUI/MobUI";
 import {Cylinder} from "@react-three/drei";
 
 const MobVisuals: React.FC<{
+    lastHit: number,
     x: number,
     y: number,
     localRef: MutableRefObject<Object3D>,
     isDead: boolean,
     id: number,
     targeted: boolean,
-}> = ({localRef, x, y, isDead, id, targeted}) => {
+}> = ({localRef, lastHit, x, y, isDead, id, targeted}) => {
 
     useFrame((state, delta) => {
         if (isDead) return
@@ -36,7 +37,7 @@ const MobVisuals: React.FC<{
     return (
         <group ref={localRef} position={[x, 0, y]}>
             <Suspense fallback={null}>
-                <Demon isDead={isDead} position={[0, isDead ? 0 : 1, 0]} onClick={() => console.log('clicked on mesh')}/>
+                <Demon isDead={isDead} lastHit={lastHit} position={[0, isDead ? 0 : 1, 0]} onClick={() => console.log('clicked on mesh')}/>
             </Suspense>
             <MobUI id={id}/>
             {

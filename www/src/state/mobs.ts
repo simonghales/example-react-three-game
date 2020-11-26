@@ -2,6 +2,7 @@ import {proxy} from "valtio";
 
 export type MobHealth = {
     health: number,
+    lastHit: number,
 }
 
 export const mobsHealthManager: {
@@ -11,6 +12,7 @@ export const mobsHealthManager: {
 export const initMobHealthManager = (id: number): MobHealth => {
     const manager = proxy<MobHealth>({
         health: 100,
+        lastHit: 0,
     })
     mobsHealthManager[id] = manager
     return manager

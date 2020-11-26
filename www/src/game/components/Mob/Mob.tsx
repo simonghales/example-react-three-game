@@ -28,6 +28,7 @@ const MobInner: React.FC<{
     const localRef = useRef<Object3D>(new Object3D())
     const isTargeted = useIsTargeted(id)
     const isDead = useIsDead(id)
+    const managerProxy = useProxy(getMobHealthManager(id))
 
     return (
         <>
@@ -36,7 +37,7 @@ const MobInner: React.FC<{
                     <MobPhysics x={x} y={y} id={id} localRef={localRef}/>
                 )
             }
-            <MobVisuals x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
+            <MobVisuals lastHit={managerProxy.lastHit} x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
             {
                 isTargeted && (
                     <MobTargetTracking localRef={localRef}/>
