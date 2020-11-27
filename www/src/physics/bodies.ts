@@ -38,6 +38,8 @@ export type AddBodyProps = AddBodyDef & {
     cacheKey?: PhysicsCacheKeys
 }
 
+// todo - add support for multiple fixtures...
+
 export const addBody = ({uuid, cacheKey, listenForCollisions, shape, fixtureOptions = {}, ...props}: AddBodyProps) => {
 
     const existingBody = existingBodies.get(uuid)
@@ -184,5 +186,49 @@ export const setBody = ({uuid, method, methodParams}: SetBodyProps) => {
             break;
         default:
             (body as any)[method](...methodParams)
+    }
+}
+
+export type UpdateBodyData = {
+    fixtureUpdate?: {
+        groupIndex?: number,
+        categoryBits?: number,
+        maskBits?: number,
+    }
+}
+
+export type UpdateBodyProps = {
+    uuid: string,
+    data: UpdateBodyData,
+}
+
+export const updateBody = ({uuid, data}: UpdateBodyProps) => {
+    const body = existingBodies.get(uuid)
+    if (!body) {
+        console.warn(`Body not found for ${uuid}`)
+        return
+    }
+    const {fixtureUpdate} = data
+    if (fixtureUpdate) {
+        const fixture = body.getFixtureList()
+        if (fixture) {
+            const {
+                groupIndex,
+                categoryBits,
+                maskBits
+            } = fixtureUpdate
+            if (
+                groupIndex !== undefined || categoryBits !== undefined || maskBits !== undefined
+            ) {
+                const originalGroupIndex = fixture.getFilterGroupIndex()
+                const originalCategoryBits = fixture.getFilterCategoryBits()
+                const originalMaskBits = fixture.getFilterMaskBits()
+                fixture.setFilterData({
+                    groupIndex: groupIndex !== undefined ? groupIndex : originalGroupIndex,
+                    categoryBits: categoryBits !== undefined ? categoryBits : originalCategoryBits,
+                    maskBits: maskBits !== undefined ? maskBits : originalMaskBits,
+                })
+            }
+        }
     }
 }

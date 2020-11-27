@@ -3,7 +3,8 @@ export enum WorkerMessageType {
     STEP,
     ADD_BODY,
     REMOVE_BODY,
-    SET_BODY
+    SET_BODY,
+    UPDATE_BODY,
 }
 
 export enum WorkerOwnerMessageType {

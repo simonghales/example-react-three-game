@@ -4,6 +4,7 @@ import {proxy, useProxy} from "valtio";
 import {attackState} from "../../hooks/attack";
 
 export const playerState = proxy({
+    rollCooldown: false,
     rolling: false,
     moving: false,
     running: false,

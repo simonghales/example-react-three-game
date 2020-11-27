@@ -13,6 +13,7 @@ import {usePlayerPhysics} from "./hooks/physics";
 import PlayerVisuals, {playerState} from "./components/PlayerVisuals/PlayerVisuals";
 import PlayerDebug from "./components/PlayerDebug/PlayerDebug";
 import {usePlayerHasTarget} from "../../../state/player";
+import {usePlayerCollisionsHandler} from "./hooks/collisions";
 
 const coroutine = (f: any, params = undefined) => {
     const o = f(params); // instantiate the coroutine
@@ -20,6 +21,15 @@ const coroutine = (f: any, params = undefined) => {
         return o.next(x);
     };
 };
+
+const rollCooldownCoroutine = function* () {
+    let wait = Date.now() + 500;
+    playerState.rollCooldown = true
+    while (Date.now() < wait) {
+        yield null;
+    }
+    playerState.rollCooldown = false
+}
 
 const rollCoroutine = function* () {
     let wait = Date.now() + 500;
@@ -32,8 +42,10 @@ const rollCoroutine = function* () {
 
 const rollManager: {
     rollCoroutine: any,
+    cooldownCoroutine: any,
 } = {
     rollCoroutine: null,
+    cooldownCoroutine: null,
 }
 
 const nippleState = {
@@ -63,6 +75,7 @@ const Player: React.FC = () => {
 
     const [ref, api, largeColliderRef, largeColliderApi, smallColliderRef, smallColliderApi] = usePlayerPhysics()
 
+    usePlayerCollisionsHandler(api)
     usePlayerControls()
     const targetLocked = usePlayerHasTarget()
 
@@ -146,7 +159,13 @@ const Player: React.FC = () => {
         const isMoving = xVel !== 0 || yVel !== 0
         const isRunning = inputsState[InputKeys.SHIFT].active
 
-        const isRolling = isRunning
+        if (!!rollManager.cooldownCoroutine) {
+            if (rollManager.cooldownCoroutine().done) {
+                rollManager.cooldownCoroutine = null
+            }
+        }
+
+        const isRolling = isRunning && targetLocked && !playerState.rollCooldown
         const ongoingRoll = !!rollManager.rollCoroutine
 
         if (ongoingRoll) {
@@ -163,6 +182,7 @@ const Player: React.FC = () => {
 
             if (response.done) {
                 rollManager.rollCoroutine = null
+                rollManager.cooldownCoroutine = coroutine(rollCooldownCoroutine)
             }
 
             applyVelocity(xVel, yVel)
@@ -177,9 +197,6 @@ const Player: React.FC = () => {
             if (isRolling) {
 
                 rollManager.rollCoroutine = coroutine(rollCoroutine)
-
-                // start roll
-                // get previous velocity and only allow minor adjustments
 
             }
 

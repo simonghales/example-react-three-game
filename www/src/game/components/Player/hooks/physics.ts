@@ -37,6 +37,7 @@ export const usePlayerPhysics = () => {
     }, [])
 
     const onSmallCollideStart = useCallback((data: any) => {
+        console.log('onSmallCollideStart')
         const mobID = data.mobID
         addToPlayerCloseRange(mobID)
     }, [])

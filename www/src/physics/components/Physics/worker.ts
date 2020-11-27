@@ -1,7 +1,7 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 import Worker from "worker-loader!../../../workers/physics/physicsWorker";
 import {WorkerMessageType} from "../../../workers/physics/types";
-import {AddBodyProps, RemoveBodyProps, SetBodyProps} from "../../bodies";
+import {AddBodyProps, RemoveBodyProps, SetBodyProps, UpdateBodyProps} from "../../bodies";
 
 export const gamePhysicsWorker = new Worker()
 
@@ -22,6 +22,13 @@ export const workerRemoveBody = (props: RemoveBodyProps) => {
 export const workerSetBody = (props: SetBodyProps) => {
     gamePhysicsWorker.postMessage({
         type: WorkerMessageType.SET_BODY,
+        props,
+    })
+}
+
+export const workerUpdateBody = (props: UpdateBodyProps) => {
+    gamePhysicsWorker.postMessage({
+        type: WorkerMessageType.UPDATE_BODY,
         props,
     })
 }

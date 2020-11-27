@@ -1,7 +1,7 @@
 import {Object3D} from "three";
 import {MutableRefObject, useLayoutEffect, useMemo, useRef, useState} from "react";
-import {workerAddBody, workerRemoveBody, workerSetBody} from "./worker";
-import {AddBodyDef, BodyType} from "../../bodies";
+import {workerAddBody, workerRemoveBody, workerSetBody, workerUpdateBody} from "./worker";
+import {AddBodyDef, BodyType, UpdateBodyData} from "../../bodies";
 import {Vec2} from "planck-js";
 import {useFrame} from "react-three-fiber";
 import {applyPositionAngle, buffers, collisionEndedEvents, collisionStartedEvents, storedPhysicsData} from "./data";
@@ -10,6 +10,7 @@ import {PhysicsCacheKeys} from "../../cache";
 export type BodyApi = {
     setPosition: (vec: Vec2) => void,
     setLinearVelocity: (vec: Vec2) => void
+    updateBody: (data: UpdateBodyData) => void,
 }
 
 export const useBody = (propsFn: () => AddBodyDef, {
@@ -94,6 +95,9 @@ export const useBody = (propsFn: () => AddBodyDef, {
             },
             setLinearVelocity: (vec) => {
                 workerSetBody({uuid: getUUID(), method: 'setLinearVelocity', methodParams: [vec]})
+            },
+            updateBody: (data: UpdateBodyData) => {
+                workerUpdateBody({uuid: getUUID(), data})
             }
         }
     }, [])

@@ -3,7 +3,7 @@
 import {WorkerMessageType, WorkerOwnerMessageType} from "./types";
 import {initPhysicsListeners, stepWorld} from "../../physics/world";
 import {syncBodies} from "./functions";
-import {addBody, removeBody, setBody} from "../../physics/bodies";
+import {addBody, removeBody, setBody, updateBody} from "../../physics/bodies";
 
 const selfWorker = self as unknown as Worker
 
@@ -44,6 +44,9 @@ self.onmessage = (event: MessageEvent) => {
             break;
         case WorkerMessageType.SET_BODY:
             setBody(props)
+            break;
+        case WorkerMessageType.UPDATE_BODY:
+            updateBody(props)
             break;
     }
 }
