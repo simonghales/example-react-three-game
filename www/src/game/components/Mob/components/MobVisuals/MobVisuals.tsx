@@ -1,4 +1,4 @@
-import React, {MutableRefObject, Suspense} from "react";
+import React, {MutableRefObject, Suspense, useCallback, useRef} from "react";
 import Demon from "../../../../../3d/models/Demon/Demon";
 import {radians} from "../../../../../utils/angles";
 import {Object3D} from "three";
@@ -7,6 +7,7 @@ import {playerPosition} from "../../../../../state/positions";
 import {lerpRadians, PI, PI_TIMES_TWO} from "../../../../../utils/numbers";
 import MobUI from "../MobUI/MobUI";
 import {Cylinder} from "@react-three/drei";
+import {playerTargets} from "../../../../../state/player";
 
 const MobVisuals: React.FC<{
     lastHit: number,
@@ -17,6 +18,21 @@ const MobVisuals: React.FC<{
     id: number,
     targeted: boolean,
 }> = ({localRef, lastHit, x, y, isDead, id, targeted}) => {
+
+    const clickedTimestampsRef = useRef({
+        lastClicked: 0,
+    })
+
+    const onClick = useCallback(() => {
+        const now = Date.now()
+        const lastClicked = clickedTimestampsRef.current.lastClicked
+
+        if (lastClicked > now - 500) {
+            playerTargets.lastAttacked = id
+        }
+
+        clickedTimestampsRef.current.lastClicked = now
+    }, [id])
 
     useFrame((state, delta) => {
         if (isDead) return
@@ -37,7 +53,7 @@ const MobVisuals: React.FC<{
     return (
         <group ref={localRef} position={[x, 0, y]}>
             <Suspense fallback={null}>
-                <Demon isDead={isDead} lastHit={lastHit} position={[0, isDead ? 0 : 1, 0]} onClick={() => console.log('clicked on mesh')}/>
+                <Demon isDead={isDead} lastHit={lastHit} position={[0, isDead ? 0 : 1, 0]} onClick={onClick}/>
             </Suspense>
             <MobUI id={id}/>
             {
