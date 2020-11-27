@@ -10,15 +10,16 @@ export const buffers = {
 }
 
 export const collisionStartedEvents: {
-    [key: string]: (data: any) => void,
+    [key: string]: (data: any, fixtureIndex: number) => void,
 } = {}
 
 export const collisionEndedEvents: {
-    [key: string]: (data: any) => void,
+    [key: string]: (data: any, fixtureIndex: number) => void,
 } = {}
 
 export type CollisionEventProps = {
     uuid: string,
+    fixtureIndex: number,
     data: {
         uuid: string,
     }
@@ -26,13 +27,13 @@ export type CollisionEventProps = {
 
 export const handleBeginCollision = (data: CollisionEventProps) => {
     if (collisionStartedEvents[data.uuid]) {
-        collisionStartedEvents[data.uuid](data.data)
+        collisionStartedEvents[data.uuid](data.data, data.fixtureIndex)
     }
 }
 
 export const handleEndCollision = (data: CollisionEventProps) => {
     if (collisionEndedEvents[data.uuid]) {
-        collisionEndedEvents[data.uuid](data.data)
+        collisionEndedEvents[data.uuid](data.data, data.fixtureIndex)
     }
 }
 

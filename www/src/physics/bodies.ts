@@ -17,17 +17,19 @@ export enum BodyShape {
 }
 
 type BasicBodyProps = Partial<BodyDef> & {
-    shape: BodyShape,
-    fixtureOptions?: Partial<FixtureOpt>,
+    fixtures: {
+        shape: BodyShape,
+        fixtureOptions: Partial<FixtureOpt>,
+        hx?: number,
+        hy?: number,
+        radius?: number,
+    }[],
 }
 
 type AddBoxBodyProps = BasicBodyProps & {
-    hx: number,
-    hy: number,
 }
 
 type AddCircleBodyProps = BasicBodyProps & {
-    radius: number,
 }
 
 export type AddBodyDef = BasicBodyProps | AddBoxBodyProps | AddCircleBodyProps
@@ -40,7 +42,7 @@ export type AddBodyProps = AddBodyDef & {
 
 // todo - add support for multiple fixtures...
 
-export const addBody = ({uuid, cacheKey, listenForCollisions, shape, fixtureOptions = {}, ...props}: AddBodyProps) => {
+export const addBody = ({uuid, cacheKey, listenForCollisions, fixtures = [], ...props}: AddBodyProps) => {
 
     const existingBody = existingBodies.get(uuid)
 
@@ -52,6 +54,7 @@ export const addBody = ({uuid, cacheKey, listenForCollisions, shape, fixtureOpti
         activeCollisionListeners[uuid] = true
     }
 
+    /*
     fixtureOptions = {
         userData: {
             uuid,
@@ -59,6 +62,7 @@ export const addBody = ({uuid, cacheKey, listenForCollisions, shape, fixtureOpti
         },
         ...fixtureOptions,
     }
+     */
 
     const bodyDef: BodyDef = {
         type: BodyType.static,
@@ -74,11 +78,34 @@ export const addBody = ({uuid, cacheKey, listenForCollisions, shape, fixtureOpti
         const cachedBody = getCachedBody(cacheKey)
         if (cachedBody) {
 
-            if (fixtureOptions) {
-                const fixture = cachedBody.getFixtureList()
-                if (fixture) {
-                    fixture.setUserData(fixtureOptions.userData)
-                }
+            if (fixtures && fixtures.length > 0) {
+
+                let bodyFixture = cachedBody.getFixtureList()
+
+                fixtures.forEach((fixture, fixtureIndex) => {
+
+                    let fixtureOptions = fixture.fixtureOptions
+
+                    fixtureOptions = {
+                        userData: {
+                            uuid,
+                            fixtureIndex,
+                            ...fixtureOptions?.userData
+                        },
+                        ...fixtureOptions,
+                    }
+
+                    if (bodyFixture) {
+
+                        if (fixtureOptions) {
+                            bodyFixture.setUserData(fixtureOptions.userData)
+                        }
+
+                        bodyFixture = bodyFixture.getNext()
+                    }
+
+                })
+
             }
 
             const {position, angle} = props
@@ -102,25 +129,45 @@ export const addBody = ({uuid, cacheKey, listenForCollisions, shape, fixtureOpti
 
         body = planckWorld.createBody(bodyDef)
 
-        let bodyShape: Shape;
+        if (fixtures && fixtures.length > 0) {
 
-        switch (shape) {
-            case BodyShape.box:
-                const {hx, hy} = props as AddBoxBodyProps
-                bodyShape = Box(hx / 2, hy / 2) as unknown as Shape
-                break;
-            case BodyShape.circle:
-                const {radius} = props as AddCircleBodyProps
-                bodyShape = Circle(radius) as unknown as Shape
-                break;
-            default:
-                throw new Error(`Unhandled body shape ${shape}`)
-        }
+            fixtures.forEach(({shape, fixtureOptions, hx, hy, radius}, fixtureIndex) => {
 
-        if (fixtureOptions) {
-            body.createFixture(bodyShape, fixtureOptions as FixtureOpt)
-        } else {
-            body.createFixture(bodyShape)
+                fixtureOptions = {
+                    userData: {
+                        uuid,
+                        fixtureIndex,
+                        ...fixtureOptions?.userData
+                    },
+                    ...fixtureOptions,
+                }
+
+                let bodyShape: Shape;
+
+                switch (shape) {
+                    case BodyShape.box:
+                        bodyShape = Box((hx as number) / 2, (hy as number) / 2) as unknown as Shape
+                        break;
+                    case BodyShape.circle:
+                        bodyShape = Circle((radius as number)) as unknown as Shape
+                        break;
+                    default:
+                        throw new Error(`Unhandled body shape ${shape}`)
+                }
+
+                if (fixtureOptions) {
+                    if (body) {
+                        body.createFixture(bodyShape, fixtureOptions as FixtureOpt)
+                    }
+                } else {
+                    if (body) {
+                        body.createFixture(bodyShape)
+                    }
+                }
+
+            })
+
+
         }
 
     }

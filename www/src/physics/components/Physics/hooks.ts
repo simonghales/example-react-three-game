@@ -24,8 +24,8 @@ export const useBody = (propsFn: () => AddBodyDef, {
     cacheKey?: PhysicsCacheKeys,
     uuid?: string,
     fwdRef?: MutableRefObject<Object3D>,
-    onCollideStart?: (data: any) => void,
-    onCollideEnd?: (data: any) => void,
+    onCollideStart?: (data: any, fixtureIndex: number) => void,
+    onCollideEnd?: (data: any, fixtureIndex: number) => void,
     debug?: string
 }): [any, BodyApi] => {
     const localRef = useRef<Object3D>((null as unknown) as Object3D)

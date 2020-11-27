@@ -11,22 +11,24 @@ export const syncBodies = () => {
     }))
 }
 
-export const sendCollisionBeginEvent = (uuid: string, data: any) => {
+export const sendCollisionBeginEvent = (uuid: string, data: any, fixtureIndex: number) => {
     selfWorker.postMessage(({
         type: WorkerOwnerMessageType.BEGIN_COLLISION,
         props: {
             uuid,
             data,
+            fixtureIndex,
         }
     }))
 }
 
-export const sendCollisionEndEvent = (uuid: string, data: any) => {
+export const sendCollisionEndEvent = (uuid: string, data: any, fixtureIndex: number) => {
     selfWorker.postMessage(({
         type: WorkerOwnerMessageType.END_COLLISION,
         props: {
             uuid,
             data,
+            fixtureIndex,
         }
     }))
 }

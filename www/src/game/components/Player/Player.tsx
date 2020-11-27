@@ -73,7 +73,7 @@ const tempVec2 = Vec2(0, 0)
 
 const Player: React.FC = () => {
 
-    const [ref, api, largeColliderRef, largeColliderApi, smallColliderRef, smallColliderApi] = usePlayerPhysics()
+    const [ref, api, largeColliderRef, largeColliderApi] = usePlayerPhysics()
 
     usePlayerCollisionsHandler(api)
     usePlayerControls()
@@ -116,10 +116,9 @@ const Player: React.FC = () => {
         tempVec2.set(x, y)
         api.setLinearVelocity(tempVec2)
         largeColliderApi.setLinearVelocity(tempVec2)
-        smallColliderApi.setLinearVelocity(tempVec2)
         playerLocalState.xVelocity = x
         playerLocalState.yVelocity = y
-    }, [api, largeColliderApi, smallColliderApi])
+    }, [api, largeColliderApi])
 
     useFrame(({gl, scene, camera}, delta) => {
         if (!ref.current) return
@@ -136,7 +135,6 @@ const Player: React.FC = () => {
 
         tempVec2.set(x, y)
         largeColliderApi.setPosition(tempVec2)
-        smallColliderApi.setPosition(tempVec2)
 
         let xVel = numLerp(playerJoystickVelocity.previousX, playerJoystickVelocity.x, 0.75)
         let yVel = numLerp(playerJoystickVelocity.previousY, playerJoystickVelocity.y, 0.75)
@@ -253,7 +251,7 @@ const Player: React.FC = () => {
             <group position={[0, 0, 0]} ref={ref}>
                 <PlayerVisuals/>
             </group>
-            <PlayerDebug largeColliderRef={largeColliderRef} smallColliderRef={smallColliderRef}/>
+            <PlayerDebug largeColliderRef={largeColliderRef}/>
         </>
     );
 };

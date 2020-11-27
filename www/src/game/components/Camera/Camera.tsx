@@ -126,7 +126,6 @@ const Camera: React.FC = () => {
                     data.atRestTimestamp = Date.now() + 250
                 } else if (Date.now() > data.atRestTimestamp) {
                     data.atRest = true
-                    console.log('at reset')
                 }
             }
         }

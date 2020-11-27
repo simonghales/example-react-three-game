@@ -7,20 +7,21 @@ import {largeColliderRadius, smallColliderRadius} from "../../hooks/physics";
 
 const PlayerDebug: React.FC<{
     largeColliderRef: MutableRefObject<Object3D>,
-    smallColliderRef: MutableRefObject<Object3D>,
-}> = ({largeColliderRef, smallColliderRef}) => {
+}> = ({largeColliderRef}) => {
+
+    return null
 
     return (
-        <>
-            <Cylinder args={[largeColliderRadius, largeColliderRadius, 0.5, 20]} ref={largeColliderRef}>
+        <group ref={largeColliderRef}>
+            <Cylinder args={[largeColliderRadius, largeColliderRadius, 0.5, 20]}>
                 <meshBasicMaterial attach="material" color={"blue"} transparent
                                    opacity={0.25}/>
             </Cylinder>
-            <Cylinder args={[smallColliderRadius, smallColliderRadius, 0.52, 20]} ref={smallColliderRef}>
+            <Cylinder args={[smallColliderRadius, smallColliderRadius, 0.52, 20]}>
                 <meshBasicMaterial attach="material" color={"blue"} transparent
                                    opacity={0.25}/>
             </Cylinder>
-        </>
+        </group>
     );
 };
 

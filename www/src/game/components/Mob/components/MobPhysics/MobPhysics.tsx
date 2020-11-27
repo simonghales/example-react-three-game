@@ -17,19 +17,21 @@ const MobPhysics: React.FC<{
 
     const [ref, api] = useBody(() => ({
         type: BodyType.static,
-        shape: BodyShape.circle,
-        radius: size,
         position: Vec2(x, y),
-        fixtureOptions: {
-            restitution: 0,
-            friction: 1,
-            density: 200,
-            isSensor: false,
-            filterCategoryBits: COLLISION_FILTER_GROUPS.mob | COLLISION_FILTER_GROUPS.attackReceiver,
-            userData: {
-                mobID: id,
-            }
-        }
+        fixtures: [{
+            shape: BodyShape.circle,
+            radius: size,
+            fixtureOptions: {
+                restitution: 0,
+                friction: 1,
+                density: 200,
+                isSensor: false,
+                filterCategoryBits: COLLISION_FILTER_GROUPS.mob | COLLISION_FILTER_GROUPS.attackReceiver,
+                userData: {
+                    mobID: id,
+                }
+            },
+        }],
     }), {
         fwdRef: localRef,
         debug: 'mob'

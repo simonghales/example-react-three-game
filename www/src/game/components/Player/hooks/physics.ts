@@ -27,33 +27,33 @@ export const usePlayerPhysics = () => {
         // console.log('player collide end')
     }, [])
 
-    const onLargeCollideStart = useCallback((data: any) => {
+    const onLargeCollideStart = useCallback((data: any, fixtureIndex: number) => {
         const mobID = data.mobID
-        playerTargets.inRange.push(mobID)
+        if (fixtureIndex === 0) {
+            playerTargets.inRange.push(mobID)
+        } else {
+            addToPlayerCloseRange(mobID)
+        }
     }, [])
 
-    const onLargeCollideEnd = useCallback(({mobID}: {mobID: number}) => {
-        removePlayerFromRange(mobID)
-    }, [])
-
-    const onSmallCollideStart = useCallback((data: any) => {
-        console.log('onSmallCollideStart')
-        const mobID = data.mobID
-        addToPlayerCloseRange(mobID)
-    }, [])
-
-    const onSmallCollideEnd = useCallback(({mobID}: {mobID: number}) => {
-        removeFromPlayerCloseRange(mobID)
+    const onLargeCollideEnd = useCallback(({mobID}: {mobID: number}, fixtureIndex: number) => {
+        if (fixtureIndex === 0) {
+            removePlayerFromRange(mobID)
+        } else {
+            removeFromPlayerCloseRange(mobID)
+        }
     }, [])
 
     const [ref, api] = useBody(() => ({
         type: BodyType.dynamic,
-        shape: BodyShape.circle,
-        radius: 0.75,
         position: Vec2(0, 0),
-        fixtureOptions: {
-            filterCategoryBits: COLLISION_FILTER_GROUPS.player,
-        }
+        fixtures: [{
+            shape: BodyShape.circle,
+            radius: 0.75,
+            fixtureOptions: {
+                filterCategoryBits: COLLISION_FILTER_GROUPS.player,
+            }
+        }],
     }), {
         onCollideStart,
         onCollideEnd
@@ -61,34 +61,29 @@ export const usePlayerPhysics = () => {
 
     const [largeColliderRef, largeColliderApi] = useBody(() => ({
         type: BodyType.dynamic,
-        shape: BodyShape.circle,
-        radius: largeColliderRadius,
         position: Vec2(0, 0),
-        fixtureOptions: {
-            isSensor: true,
-            filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
-            filterMaskBits: COLLISION_FILTER_GROUPS.mob,
-        }
+        fixtures: [{
+            shape: BodyShape.circle,
+            radius: largeColliderRadius,
+            fixtureOptions: {
+                isSensor: true,
+                filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
+                filterMaskBits: COLLISION_FILTER_GROUPS.mob,
+            },
+        }, {
+            shape: BodyShape.circle,
+            radius: smallColliderRadius,
+            fixtureOptions: {
+                isSensor: true,
+                filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
+                filterMaskBits: COLLISION_FILTER_GROUPS.mob,
+            },
+        }],
     }), {
         onCollideStart: onLargeCollideStart,
         onCollideEnd: onLargeCollideEnd,
     })
 
-    const [smallColliderRef, smallColliderApi] = useBody(() => ({
-        type: BodyType.dynamic,
-        shape: BodyShape.circle,
-        radius: smallColliderRadius,
-        position: Vec2(0, 0),
-        fixtureOptions: {
-            isSensor: true,
-            filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
-            filterMaskBits: COLLISION_FILTER_GROUPS.mob,
-        }
-    }), {
-        onCollideStart: onSmallCollideStart,
-        onCollideEnd: onSmallCollideEnd,
-    })
-
-    return [ref, api, largeColliderRef, largeColliderApi, smallColliderRef, smallColliderApi]
+    return [ref, api, largeColliderRef, largeColliderApi]
 
 }

@@ -42,14 +42,16 @@ const AttackCollider: React.FC<{
 
     const [ref, api] = useBody(() => ({
         type: BodyType.dynamic,
-        shape: BodyShape.circle,
-        radius: size,
         position: Vec2(x, y),
-        fixtureOptions: {
-            isSensor: true,
-            filterCategoryBits: COLLISION_FILTER_GROUPS.attackCollider,
-            filterMaskBits: COLLISION_FILTER_GROUPS.attackReceiver,
-        }
+        fixtures: [{
+            shape: BodyShape.circle,
+            radius: size,
+            fixtureOptions: {
+                isSensor: true,
+                filterCategoryBits: COLLISION_FILTER_GROUPS.attackCollider,
+                filterMaskBits: COLLISION_FILTER_GROUPS.attackReceiver,
+            },
+        }],
     }), {
         onCollideStart,
         cacheKey: PhysicsCacheKeys.PUNCH,

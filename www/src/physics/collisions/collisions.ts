@@ -3,36 +3,51 @@ import {FixtureUserData} from "./types";
 import {sendCollisionBeginEvent, sendCollisionEndEvent} from "../../workers/physics/functions";
 import {activeCollisionListeners} from "./data";
 
-const getFixtureUuid = (fixture: Fixture): string => {
+const getFixtureData = (fixture: Fixture): FixtureUserData | null => {
     const userData = fixture.getUserData() as null | FixtureUserData
-    if (userData && userData['uuid']) {
-        return userData.uuid
+    return userData || null
+}
+
+const getFixtureUuid = (data: FixtureUserData | null): string => {
+    if (data && data['uuid']) {
+        return data.uuid
     }
     return ''
 }
 
+const getFixtureIndex = (data: FixtureUserData | null): number => {
+    if (data) {
+        return data.fixtureIndex
+    }
+    return -1
+}
+
 export const handleBeginCollision = (fixtureA: Fixture, fixtureB: Fixture) => {
-    const aUUID = getFixtureUuid(fixtureA)
-    const bUUID = getFixtureUuid(fixtureB)
+    const aData = getFixtureData(fixtureA)
+    const bData = getFixtureData(fixtureB)
+    const aUUID = getFixtureUuid(aData)
+    const bUUID = getFixtureUuid(bData)
 
     if (aUUID && activeCollisionListeners[aUUID]) {
-        sendCollisionBeginEvent(aUUID, fixtureB.getUserData())
+        sendCollisionBeginEvent(aUUID, bData, getFixtureIndex(aData))
     }
 
     if (bUUID && activeCollisionListeners[bUUID]) {
-        sendCollisionBeginEvent(bUUID, fixtureA.getUserData())
+        sendCollisionBeginEvent(bUUID, aData, getFixtureIndex(bData))
     }
 }
 
 export const handleEndCollision = (fixtureA: Fixture, fixtureB: Fixture) => {
-    const aUUID = getFixtureUuid(fixtureA)
-    const bUUID = getFixtureUuid(fixtureB)
+    const aData = getFixtureData(fixtureA)
+    const bData = getFixtureData(fixtureB)
+    const aUUID = getFixtureUuid(aData)
+    const bUUID = getFixtureUuid(bData)
 
     if (aUUID && activeCollisionListeners[aUUID]) {
-        sendCollisionEndEvent(aUUID, fixtureB.getUserData())
+        sendCollisionEndEvent(aUUID, bData, getFixtureIndex(aData))
     }
 
     if (bUUID && activeCollisionListeners[bUUID]) {
-        sendCollisionEndEvent(bUUID, fixtureA.getUserData())
+        sendCollisionEndEvent(bUUID, aData, getFixtureIndex(bData))
     }
 }
