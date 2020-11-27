@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei/useGLTF'
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import {AnimationAction, AnimationMixer, Bone, Group, LoopOnce, MeshToonMaterial, SkinnedMesh} from "three";
 import {hexStringToCode} from "../../../utils/color";
+import {Event} from "three/src/core/EventDispatcher";
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -71,7 +72,15 @@ export default function Knight({moving, running, lastAttack, ...props}: JSX.Intr
   const actions = useRef<GLTFActions>()
   const [mixer] = useState(() => new AnimationMixer(nodes['Cube.004_4']))
 
-    const currentAnimationRef = useRef<any>()
+    const currentAnimationRef = useRef<{
+        key: string | null,
+        animation: any,
+        finished: boolean,
+    }>({
+        key: null,
+        animation: null,
+        finished: false,
+    })
 
   useFrame((state, delta) => mixer.update(delta))
   useEffect(() => {
@@ -90,59 +99,83 @@ export default function Knight({moving, running, lastAttack, ...props}: JSX.Intr
     return () => animations.forEach((clip) => mixer.uncacheClip(clip))
   }, [])
 
+
     useEffect(() => {
 
-        if (!actions.current) return
+        let unsubscribe = () => {}
 
-        const duration = 0.25
-        const currentAnimation: any = currentAnimationRef.current
+        const calculateAnimation = () => {
 
-        let newAnimation = actions.current.Idle
-        let nonAttackAnimation = newAnimation
+            if (!actions.current) return
 
-        if (moving) {
-            if (running) {
-                newAnimation = actions.current.Run
-            } else {
-                newAnimation = actions.current.Walk
+            const currentAnimation = currentAnimationRef.current
+
+            const duration = 0.2
+            const quickDuration = 0.05
+
+            const playAnimation = (animation: any, fadeInDuration: number, fadeDuration: number, key: string | null) => {
+                if (currentAnimation.animation) {
+                    currentAnimation.animation.fadeOut(fadeDuration)
+                } else {
+                    fadeInDuration = 0
+                }
+                animation
+                    .reset()
+                    .setEffectiveWeight(1)
+                    .fadeIn(fadeInDuration)
+                    .play();
+                currentAnimation.animation = animation
+                currentAnimation.key = key
+                currentAnimation.finished = false
             }
+
+            const isHit = lastAttack > Date.now() - 100
+            const key = lastAttack.toString()
+
+            if (isHit || (currentAnimation.key === key && !currentAnimation.finished)) {
+
+                if (currentAnimation.animation && currentAnimation.key === key) {
+                    //
+                } else {
+                    playAnimation(actions.current.Punch, quickDuration, quickDuration, key)
+                }
+
+                const onFinished = (event: Event) => {
+                    mixer.removeEventListener('finished', onFinished)
+                    if (actions.current && event.action === actions.current.Punch) {
+                        currentAnimation.finished = true
+                        calculateAnimation()
+                    }
+                }
+
+                mixer.addEventListener('finished', onFinished)
+
+                unsubscribe = () => {
+                    mixer.removeEventListener('finished', onFinished)
+                }
+
+            } else {
+
+                if (moving) {
+
+                    if (running) {
+                        playAnimation(actions.current.Run, duration, duration, null)
+                    } else {
+                        playAnimation(actions.current.Walk, duration, duration, null)
+                    }
+
+                } else {
+                    playAnimation(actions.current.Idle, duration, duration, null)
+                }
+
+            }
+
         }
 
-        if (lastAttack && lastAttack > Date.now() - 500) {
-            nonAttackAnimation = newAnimation
-            newAnimation = actions.current.Punch
-        }
-
-        if (currentAnimation && currentAnimation !== newAnimation)  {
-            currentAnimation.fadeOut(duration)
-            newAnimation
-                .reset()
-                .setEffectiveWeight(1)
-                .fadeIn(duration)
-                .play();
-        } else if (currentAnimation === newAnimation && newAnimation === actions.current.Punch) {
-            newAnimation.reset()
-                .play()
-        } else {
-            newAnimation.play();
-        }
-
-        currentAnimationRef.current = newAnimation
-
-        const onFinished = () => {
-            currentAnimationRef.current.fadeOut(duration)
-            nonAttackAnimation
-                .reset()
-                .setEffectiveWeight(1)
-                .fadeIn(duration)
-                .play();
-            currentAnimationRef.current = nonAttackAnimation
-        }
-
-        mixer.addEventListener('finished', onFinished)
+        calculateAnimation()
 
         return () => {
-            mixer.removeEventListener('finished', onFinished)
+            unsubscribe()
         }
 
     }, [moving, running, lastAttack])
@@ -167,7 +200,7 @@ export default function Knight({moving, running, lastAttack, ...props}: JSX.Intr
         skeleton={nodes['Cube.004_3'].skeleton}
       />
       <skinnedMesh receiveShadow castShadow
-        material={armorDarkMaterial}
+        material={armorMaterial}
         geometry={nodes['Cube.004_4'].geometry}
         skeleton={nodes['Cube.004_4'].skeleton}
       />

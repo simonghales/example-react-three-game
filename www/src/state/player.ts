@@ -1,10 +1,12 @@
 import {proxy, useProxy} from "valtio";
 
 export const playerTargets = proxy<{
+    closeRange: number[],
     inRange: number[],
     targetID: number | null,
     lastAttacked: number | null,
 }>({
+    closeRange: [],
     inRange: [],
     targetID: null,
     lastAttacked: null,
@@ -16,9 +18,12 @@ export const useEnemiesInRange = (): boolean => {
 }
 
 export const usePlayerTarget = (): number | null => {
-    const {inRange: targets, lastAttacked} = useProxy(playerTargets)
+    const {inRange: targets, lastAttacked, closeRange} = useProxy(playerTargets)
     if (lastAttacked !== null && targets.includes(lastAttacked)) {
         return lastAttacked
+    }
+    if (closeRange.length > 0) {
+        return closeRange[0]
     }
     return null
     // return targets.length > 0 ? targets[0] : null
@@ -28,9 +33,20 @@ export const usePlayerHasTarget = (): boolean => {
     return usePlayerTarget() !== null
 }
 
-export const removePlayerTarget = (mobID: number) => {
+export const removePlayerFromRange = (mobID: number) => {
     const index = playerTargets.inRange.indexOf(mobID)
     if (index >= 0) {
         playerTargets.inRange.splice(index, 1)
+    }
+}
+
+export const addToPlayerCloseRange = (mobID: number) => {
+    playerTargets.closeRange.push(mobID)
+}
+
+export const removeFromPlayerCloseRange = (mobID: number) => {
+    const index = playerTargets.closeRange.indexOf(mobID)
+    if (index >= 0) {
+        playerTargets.closeRange.splice(index, 1)
     }
 }

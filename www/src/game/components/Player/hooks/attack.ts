@@ -2,6 +2,7 @@ import {useFrame} from "react-three-fiber";
 import {proxy, useProxy} from "valtio";
 import {InputKeys, inputsState} from "../../../../state/inputs";
 import {playerPosition} from "../../../../state/positions";
+import {playerState} from "../components/PlayerVisuals/PlayerVisuals";
 
 let attackCount = 0
 
@@ -28,6 +29,11 @@ export const usePlayerAttackHandler = () => {
 
     useFrame(() => {
         if (inputsState[InputKeys.PUNCH].released) {
+
+            const canAttack = !playerState.rolling
+
+            if (!canAttack) return
+
             attackState.lastAttack = Date.now()
             setTimeout(() => {
                 const {x, y, angle} = playerPosition

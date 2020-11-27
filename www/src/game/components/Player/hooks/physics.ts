@@ -5,7 +5,15 @@ import {useCallback} from "react";
 import {useFrame} from "react-three-fiber";
 import {COLLISION_FILTER_GROUPS} from "../../../../physics/collisions/filters";
 import {devState} from "../../../../state/dev";
-import {playerTargets, removePlayerTarget} from "../../../../state/player";
+import {
+    addToPlayerCloseRange,
+    playerTargets,
+    removeFromPlayerCloseRange,
+    removePlayerFromRange
+} from "../../../../state/player";
+
+export const largeColliderRadius = 12
+export const smallColliderRadius = 4.5
 
 const tempVec2 = Vec2(0, 0)
 
@@ -19,13 +27,22 @@ export const usePlayerPhysics = () => {
         // console.log('player collide end')
     }, [])
 
-    const onRadiusCollideStart = useCallback((data: any) => {
+    const onLargeCollideStart = useCallback((data: any) => {
         const mobID = data.mobID
         playerTargets.inRange.push(mobID)
     }, [])
 
-    const onRadiusCollideEnd = useCallback(({mobID}: {mobID: number}) => {
-        removePlayerTarget(mobID)
+    const onLargeCollideEnd = useCallback(({mobID}: {mobID: number}) => {
+        removePlayerFromRange(mobID)
+    }, [])
+
+    const onSmallCollideStart = useCallback((data: any) => {
+        const mobID = data.mobID
+        addToPlayerCloseRange(mobID)
+    }, [])
+
+    const onSmallCollideEnd = useCallback(({mobID}: {mobID: number}) => {
+        removeFromPlayerCloseRange(mobID)
     }, [])
 
     const [ref, api] = useBody(() => ({
@@ -41,10 +58,10 @@ export const usePlayerPhysics = () => {
         onCollideEnd
     })
 
-    const [radiusRef, radiusApi] = useBody(() => ({
+    const [largeColliderRef, largeColliderApi] = useBody(() => ({
         type: BodyType.dynamic,
         shape: BodyShape.circle,
-        radius: 8,
+        radius: largeColliderRadius,
         position: Vec2(0, 0),
         fixtureOptions: {
             isSensor: true,
@@ -52,10 +69,25 @@ export const usePlayerPhysics = () => {
             filterMaskBits: COLLISION_FILTER_GROUPS.mob,
         }
     }), {
-        onCollideStart: onRadiusCollideStart,
-        onCollideEnd: onRadiusCollideEnd,
+        onCollideStart: onLargeCollideStart,
+        onCollideEnd: onLargeCollideEnd,
     })
 
-    return [ref, api, radiusRef, radiusApi]
+    const [smallColliderRef, smallColliderApi] = useBody(() => ({
+        type: BodyType.dynamic,
+        shape: BodyShape.circle,
+        radius: smallColliderRadius,
+        position: Vec2(0, 0),
+        fixtureOptions: {
+            isSensor: true,
+            filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
+            filterMaskBits: COLLISION_FILTER_GROUPS.mob,
+        }
+    }), {
+        onCollideStart: onSmallCollideStart,
+        onCollideEnd: onSmallCollideEnd,
+    })
+
+    return [ref, api, largeColliderRef, largeColliderApi, smallColliderRef, smallColliderApi]
 
 }

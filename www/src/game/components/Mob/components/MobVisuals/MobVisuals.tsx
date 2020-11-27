@@ -31,7 +31,7 @@ const MobVisuals: React.FC<{
             prevAngle -= PI_TIMES_TWO
         }
 
-        localRef.current.rotation.y = lerpRadians(prevAngle, angle, 10 * delta)
+        localRef.current.rotation.y = lerpRadians(prevAngle, angle, 2.5 * delta)
     })
 
     return (

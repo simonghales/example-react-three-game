@@ -1,27 +1,51 @@
 import React, {Suspense, useCallback, useEffect, useRef} from "react";
 import {nippleManager} from "../Joystick/Joystick";
 import {useFrame} from "react-three-fiber";
-import {proxy, useProxy} from "valtio";
 import {radians} from "../../../utils/angles";
 import {gameRefs} from "../../../state/refs";
-import {usePlayerCamera} from "./hooks/camera";
 import {playerPosition} from "../../../state/positions";
 import {usePlayerControls} from "./hooks/controls";
 import {InputKeys, inputsState} from "../../../state/inputs";
 import {lerpRadians, numLerp, PI, PI_TIMES_TWO} from "../../../utils/numbers";
 import {DIAGONAL} from "../../../utils/common";
-import {devState} from "../../../state/dev";
 import {Vec2} from "planck-js";
 import {usePlayerPhysics} from "./hooks/physics";
 import PlayerVisuals, {playerState} from "./components/PlayerVisuals/PlayerVisuals";
 import PlayerDebug from "./components/PlayerDebug/PlayerDebug";
 import {usePlayerHasTarget} from "../../../state/player";
 
+const coroutine = (f: any, params = undefined) => {
+    const o = f(params); // instantiate the coroutine
+    return function (x: any) {
+        return o.next(x);
+    };
+};
+
+const rollCoroutine = function* () {
+    let wait = Date.now() + 500;
+    playerState.rolling = true
+    while (Date.now() < wait) {
+        yield null;
+    }
+    playerState.rolling = false
+}
+
+const rollManager: {
+    rollCoroutine: any,
+} = {
+    rollCoroutine: null,
+}
+
 const nippleState = {
     active: false,
 }
 
-const playerVelocity = {
+const playerLocalState = {
+    xVelocity: 0,
+    yVelocity: 0,
+}
+
+const playerJoystickVelocity = {
     x: 0,
     y: 0,
     previousX: 0,
@@ -31,12 +55,13 @@ const playerVelocity = {
 
 const WALKING_SPEED = 5
 const RUNNING_SPEED = WALKING_SPEED * 2
+const ROLLING_SPEED = RUNNING_SPEED
 
 const tempVec2 = Vec2(0, 0)
 
 const Player: React.FC = () => {
 
-    const [ref, api, radiusRef, radiusApi] = usePlayerPhysics()
+    const [ref, api, largeColliderRef, largeColliderApi, smallColliderRef, smallColliderApi] = usePlayerPhysics()
 
     usePlayerControls()
     const targetLocked = usePlayerHasTarget()
@@ -53,26 +78,35 @@ const Player: React.FC = () => {
 
         nippleManager?.on("end", () => {
             nippleState.active = false
-            playerVelocity.previousX = 0
-            playerVelocity.previousY = 0
-            playerVelocity.x = 0
-            playerVelocity.y = 0
+            playerJoystickVelocity.previousX = 0
+            playerJoystickVelocity.previousY = 0
+            playerJoystickVelocity.x = 0
+            playerJoystickVelocity.y = 0
         })
 
         nippleManager?.on("move", (_, data) => {
             const {x, y} = data.vector
-            playerVelocity.previousX = playerVelocity.x
-            playerVelocity.previousY = playerVelocity.y
+            playerJoystickVelocity.previousX = playerJoystickVelocity.x
+            playerJoystickVelocity.previousY = playerJoystickVelocity.y
             if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
-                playerVelocity.x = 0
-                playerVelocity.y = 0
+                playerJoystickVelocity.x = 0
+                playerJoystickVelocity.y = 0
                 return
             }
-            playerVelocity.x = x * -1
-            playerVelocity.y = y
+            playerJoystickVelocity.x = x * -1
+            playerJoystickVelocity.y = y
         })
 
     }, [])
+
+    const applyVelocity = useCallback((x: number, y: number) => {
+        tempVec2.set(x, y)
+        api.setLinearVelocity(tempVec2)
+        largeColliderApi.setLinearVelocity(tempVec2)
+        smallColliderApi.setLinearVelocity(tempVec2)
+        playerLocalState.xVelocity = x
+        playerLocalState.yVelocity = y
+    }, [api, largeColliderApi, smallColliderApi])
 
     useFrame(({gl, scene, camera}, delta) => {
         if (!ref.current) return
@@ -88,10 +122,11 @@ const Player: React.FC = () => {
         const {x, z: y} = ref.current.position
 
         tempVec2.set(x, y)
-        radiusApi.setPosition(tempVec2)
+        largeColliderApi.setPosition(tempVec2)
+        smallColliderApi.setPosition(tempVec2)
 
-        let xVel = numLerp(playerVelocity.previousX, playerVelocity.x, 0.75)
-        let yVel = numLerp(playerVelocity.previousY, playerVelocity.y, 0.75)
+        let xVel = numLerp(playerJoystickVelocity.previousX, playerJoystickVelocity.x, 0.75)
+        let yVel = numLerp(playerJoystickVelocity.previousY, playerJoystickVelocity.y, 0.75)
 
         if (!nippleState.active) {
             let up = inputsState[InputKeys.UP].active
@@ -111,20 +146,46 @@ const Player: React.FC = () => {
         const isMoving = xVel !== 0 || yVel !== 0
         const isRunning = inputsState[InputKeys.SHIFT].active
 
-        if (isMoving) {
+        const isRolling = isRunning
+        const ongoingRoll = !!rollManager.rollCoroutine
 
-            let speed = isRunning ? RUNNING_SPEED : WALKING_SPEED
+        if (ongoingRoll) {
+
+            let speed = ROLLING_SPEED
 
             const adjustedXVel = xVel * speed
             const adjustedYVel = yVel * speed
 
-            tempVec2.set(adjustedXVel, adjustedYVel)
-            api.setLinearVelocity(tempVec2)
-            radiusApi.setLinearVelocity(tempVec2)
+            xVel = numLerp(playerLocalState.xVelocity, adjustedXVel, 0.1)
+            yVel = numLerp(playerLocalState.yVelocity, adjustedYVel, 0.1)
+
+            const response = rollManager.rollCoroutine()
+
+            if (response.done) {
+                rollManager.rollCoroutine = null
+            }
+
+            applyVelocity(xVel, yVel)
+
+        } else if (isMoving) {
+
+            let speed = isRolling ? ROLLING_SPEED : isRunning ? RUNNING_SPEED : WALKING_SPEED
+
+            const adjustedXVel = xVel * speed
+            const adjustedYVel = yVel * speed
+
+            if (isRolling) {
+
+                rollManager.rollCoroutine = coroutine(rollCoroutine)
+
+                // start roll
+                // get previous velocity and only allow minor adjustments
+
+            }
+
+            applyVelocity(adjustedXVel, adjustedYVel)
         } else {
-            tempVec2.set(0, 0)
-            api.setLinearVelocity(tempVec2)
-            radiusApi.setLinearVelocity(tempVec2)
+            applyVelocity(0, 0)
         }
 
         let prevAngle = ref.current.rotation.y // convert to low equivalent angle
@@ -134,22 +195,22 @@ const Player: React.FC = () => {
 
         const isTargetLocked = targetLocked
 
-        if (isTargetLocked) {
+        if (isTargetLocked && !ongoingRoll) {
 
             const targetX = playerPosition.targetX
             const targetY = playerPosition.targetY
             const angle = Math.atan2((targetX - x), (targetY - y))
             ref.current.rotation.y = lerpRadians(prevAngle, angle, 10 * delta)
-            playerVelocity.targetAngle = angle
+            playerJoystickVelocity.targetAngle = angle
         } else {
 
             if (isMoving) {
                 const angle = Math.atan2(-yVel, xVel) - radians(270)
-                playerVelocity.targetAngle = angle
+                playerJoystickVelocity.targetAngle = angle
             }
 
-            if (prevAngle !== playerVelocity.targetAngle) {
-                ref.current.rotation.y = lerpRadians(prevAngle, playerVelocity.targetAngle, 10 * delta)
+            if (prevAngle !== playerJoystickVelocity.targetAngle) {
+                ref.current.rotation.y = lerpRadians(prevAngle, playerJoystickVelocity.targetAngle, 10 * delta)
             }
 
         }
@@ -175,7 +236,7 @@ const Player: React.FC = () => {
             <group position={[0, 0, 0]} ref={ref}>
                 <PlayerVisuals/>
             </group>
-            <PlayerDebug radiusRef={radiusRef}/>
+            <PlayerDebug largeColliderRef={largeColliderRef} smallColliderRef={smallColliderRef}/>
         </>
     );
 };

@@ -1,15 +1,23 @@
 import React from "react";
 import {HTML} from "@react-three/drei";
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import {useProxy} from "valtio";
 import {getMobHealthManager} from "../../../../../state/mobs";
 
-const StyledContainer = styled.div`
+const cssHide = css`
+  opacity: 0;
+`
+
+const StyledContainer = styled.div<{
+    hide: boolean,
+}>`
     width: 100px;
     height: 20px;
     background-color: rgba(255,255,255,0.5);
     position: relative;
     overflow: hidden;
+    transition: opacity 500ms 250ms ease;
+    ${props => props.hide ? cssHide : ''};
 `;
 
 const StyledAmount = styled.div<{
@@ -32,7 +40,7 @@ const MobUI: React.FC<{
     return (
         <group position={[0, 3.5, 0]}>
             <HTML center>
-                <StyledContainer>
+                <StyledContainer hide={managerProxy.health === 0}>
                     <StyledAmount amount={managerProxy.health}/>
                 </StyledContainer>
             </HTML>
