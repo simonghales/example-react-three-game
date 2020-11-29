@@ -55,10 +55,10 @@ const MobVisuals: React.FC<{
             <Suspense fallback={null}>
                 <Demon isDead={isDead} lastHit={lastHit} position={[0, isDead ? 0 : 1, 0]} onClick={onClick}/>
             </Suspense>
-            <Cylinder args={[0.75, 0.75]}>
-                <meshBasicMaterial attach="material" color={"purple"} transparent
-                                   opacity={0.25}/>
-            </Cylinder>
+            {/*<Cylinder args={[0.75, 0.75]}>*/}
+            {/*    <meshBasicMaterial attach="material" color={"purple"} transparent*/}
+            {/*                       opacity={0.25}/>*/}
+            {/*</Cylinder>*/}
             <MobUI id={id}/>
             {
                 targeted && (
