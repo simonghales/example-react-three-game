@@ -1,9 +1,10 @@
 import React, {MutableRefObject} from "react";
 import {Object3D} from "three";
-import {Cylinder} from "@react-three/drei";
+import {Box, Cylinder} from "@react-three/drei";
 import {useProxy} from "valtio";
 import {devState} from "../../../../../state/dev";
-import {largeColliderRadius, smallColliderRadius} from "../../hooks/physics";
+import {boxSize, largeColliderRadius, smallColliderRadius} from "../../hooks/physics";
+import {radians} from "../../../../../utils/angles";
 
 const PlayerDebug: React.FC<{
     largeColliderRef: MutableRefObject<Object3D>,
@@ -21,6 +22,10 @@ const PlayerDebug: React.FC<{
                 <meshBasicMaterial attach="material" color={"blue"} transparent
                                    opacity={0.25}/>
             </Cylinder>
+            <Box args={[boxSize.width, 1, boxSize.length]} position={[0, 0.005, boxSize.offset]} rotation={[0, radians(0), 0]}>
+                <meshBasicMaterial attach="material" color={"green"} transparent
+                                   opacity={0.25}/>
+            </Box>
         </group>
     );
 };

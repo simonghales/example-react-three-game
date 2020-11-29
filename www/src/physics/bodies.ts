@@ -22,6 +22,7 @@ type BasicBodyProps = Partial<BodyDef> & {
         fixtureOptions: Partial<FixtureOpt>,
         hx?: number,
         hy?: number,
+        center?: [number, number],
         radius?: number,
     }[],
 }
@@ -131,7 +132,7 @@ export const addBody = ({uuid, cacheKey, listenForCollisions, fixtures = [], ...
 
         if (fixtures && fixtures.length > 0) {
 
-            fixtures.forEach(({shape, fixtureOptions, hx, hy, radius}, fixtureIndex) => {
+            fixtures.forEach(({shape, fixtureOptions, hx, hy, radius, center}, fixtureIndex) => {
 
                 fixtureOptions = {
                     userData: {
@@ -146,7 +147,7 @@ export const addBody = ({uuid, cacheKey, listenForCollisions, fixtures = [], ...
 
                 switch (shape) {
                     case BodyShape.box:
-                        bodyShape = Box((hx as number) / 2, (hy as number) / 2) as unknown as Shape
+                        bodyShape = Box((hx as number) / 2, (hy as number) / 2, center ? Vec2(center[0], center[1]): undefined) as unknown as Shape
                         break;
                     case BodyShape.circle:
                         bodyShape = Circle((radius as number)) as unknown as Shape
@@ -227,6 +228,10 @@ export const setBody = ({uuid, method, methodParams}: SetBodyProps) => {
         return
     }
     switch (method) {
+        //case 'setAngle':
+        //    const [angle] = methodParams
+        //    body.setTransform(body.getPosition(), angle)
+        //    break;
         case 'setLinearVelocity':
             // console.log('methodParams', methodParams[0].x, methodParams[0].y);
             (body as any)[method](...methodParams)

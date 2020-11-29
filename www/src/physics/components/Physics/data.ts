@@ -55,7 +55,7 @@ export const applyPositionAngle = (object: Object3D | null, index: number, apply
             // console.log('debug', debug, position)
         }
         if (applyAngle) {
-            object.rotation.y = buffers.angles[index]
+            object.rotation.y = buffers.angles[index] * -1
         }
     } else {
         // console.warn('no match?')

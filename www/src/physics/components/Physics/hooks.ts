@@ -9,11 +9,13 @@ import {PhysicsCacheKeys} from "../../cache";
 
 export type BodyApi = {
     setPosition: (vec: Vec2) => void,
-    setLinearVelocity: (vec: Vec2) => void
+    setLinearVelocity: (vec: Vec2) => void,
+    setAngle: (angle: number) => void,
     updateBody: (data: UpdateBodyData) => void,
 }
 
 export const useBody = (propsFn: () => AddBodyDef, {
+    applyAngle = false,
     cacheKey,
     uuid: passedUUID,
     fwdRef,
@@ -21,6 +23,7 @@ export const useBody = (propsFn: () => AddBodyDef, {
     onCollideStart,
     debug
 }: {
+    applyAngle?: boolean,
     cacheKey?: PhysicsCacheKeys,
     uuid?: string,
     fwdRef?: MutableRefObject<Object3D>,
@@ -81,7 +84,7 @@ export const useBody = (propsFn: () => AddBodyDef, {
         }
         if (ref.current && buffers.positions.length && buffers.angles.length) {
             const index = storedPhysicsData.bodies[uuid]
-            applyPositionAngle(ref.current, index, false, debug)
+            applyPositionAngle(ref.current, index, applyAngle, debug)
         }
     })
 
@@ -98,6 +101,9 @@ export const useBody = (propsFn: () => AddBodyDef, {
             },
             updateBody: (data: UpdateBodyData) => {
                 workerUpdateBody({uuid: getUUID(), data})
+            },
+            setAngle: (angle: number) => {
+                workerSetBody({uuid: getUUID(), method: 'setAngle', methodParams: [angle]})
             }
         }
     }, [])

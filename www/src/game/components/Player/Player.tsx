@@ -71,6 +71,8 @@ const ROLLING_SPEED = RUNNING_SPEED
 
 const tempVec2 = Vec2(0, 0)
 
+let thing = false
+
 const Player: React.FC = () => {
 
     const [ref, api, largeColliderRef, largeColliderApi] = usePlayerPhysics()
@@ -81,6 +83,16 @@ const Player: React.FC = () => {
 
     useEffect(() => {
         gameRefs.player = ref.current
+
+        //largeColliderApi.setAngle(radians(45))
+        //console.log('radians(45)', radians(45))
+        //console.log('radians', radians(90)) 1.57
+
+        /*setInterval(() => {
+            largeColliderApi.setAngle(radians(thing ? 90 : 0))
+            thing = !thing
+        }, 5000)*/
+
     }, [])
 
     useEffect(() => {
@@ -130,6 +142,7 @@ const Player: React.FC = () => {
 
         playerPosition.previousX = playerPosition.x
         playerPosition.previousY = playerPosition.y
+        //largeColliderApi.setAngle(ref.current.rotation.y)
 
         const {x, z: y} = ref.current.position
 
@@ -241,6 +254,10 @@ const Player: React.FC = () => {
         playerPosition.x = x
         playerPosition.y = y
         playerPosition.angle = ref.current.rotation.y
+
+        largeColliderApi.setAngle(ref.current.rotation.y * -1)
+
+        //console.log('angle', ref.current.rotation.y)
 
         gl.render(scene, camera)
 

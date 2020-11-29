@@ -3,6 +3,8 @@ import {proxy, useProxy} from "valtio";
 import {InputKeys, inputsState} from "../../../../state/inputs";
 import {playerPosition} from "../../../../state/positions";
 import {playerState} from "../components/PlayerVisuals/PlayerVisuals";
+import {playerTargets} from "../../../../state/player";
+import {getMobHealthManager} from "../../../../state/mobs";
 
 let attackCount = 0
 
@@ -36,6 +38,17 @@ export const usePlayerAttackHandler = () => {
 
             attackState.lastAttack = Date.now()
             setTimeout(() => {
+                console.log('playerTargets', playerTargets.attackRange)
+                playerTargets.attackRange.forEach((mobID, index) => {
+                    if (index === 0) {
+                        playerTargets.lastAttacked = mobID
+                    }
+                    const manager = getMobHealthManager(mobID)
+                    if (!manager) return
+                    manager.health = manager.health - 25
+                    manager.lastHit = Date.now()
+                })
+                /*
                 const {x, y, angle} = playerPosition
                 const vX = Math.sin(angle)
                 const vY = Math.cos(angle)
@@ -51,6 +64,7 @@ export const usePlayerAttackHandler = () => {
                     vY,
                     expires: Date.now() + 100,
                 })
+                 */
             }, 200)
         }
     }, )

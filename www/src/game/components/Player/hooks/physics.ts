@@ -2,18 +2,22 @@ import {useBody} from "../../../../physics/components/Physics/hooks";
 import {BodyShape, BodyType} from "../../../../physics/bodies";
 import {Vec2} from "planck-js";
 import {useCallback} from "react";
-import {useFrame} from "react-three-fiber";
 import {COLLISION_FILTER_GROUPS} from "../../../../physics/collisions/filters";
-import {devState} from "../../../../state/dev";
 import {
+    addToPlayerAttackRange,
     addToPlayerCloseRange,
-    playerTargets,
+    playerTargets, removeFromPlayerAttackRange,
     removeFromPlayerCloseRange,
     removePlayerFromRange
 } from "../../../../state/player";
 
 export const largeColliderRadius = 12
 export const smallColliderRadius = 4.5
+export const boxSize = {
+    width: 2.5,
+    length: 2,
+    offset: 1,
+}
 
 const tempVec2 = Vec2(0, 0)
 
@@ -31,16 +35,20 @@ export const usePlayerPhysics = () => {
         const mobID = data.mobID
         if (fixtureIndex === 0) {
             playerTargets.inRange.push(mobID)
-        } else {
+        } else if (fixtureIndex === 1) {
             addToPlayerCloseRange(mobID)
+        } else if (fixtureIndex === 2) {
+            addToPlayerAttackRange(mobID)
         }
     }, [])
 
     const onLargeCollideEnd = useCallback(({mobID}: {mobID: number}, fixtureIndex: number) => {
         if (fixtureIndex === 0) {
             removePlayerFromRange(mobID)
-        } else {
+        } else if (fixtureIndex === 1) {
             removeFromPlayerCloseRange(mobID)
+        } else if (fixtureIndex === 2) {
+            removeFromPlayerAttackRange(mobID)
         }
     }, [])
 
@@ -61,8 +69,10 @@ export const usePlayerPhysics = () => {
 
     const [largeColliderRef, largeColliderApi] = useBody(() => ({
         type: BodyType.dynamic,
+        fixedRotation: false,
         position: Vec2(0, 0),
-        fixtures: [{
+        fixtures: [
+            {
             shape: BodyShape.circle,
             radius: largeColliderRadius,
             fixtureOptions: {
@@ -78,8 +88,19 @@ export const usePlayerPhysics = () => {
                 filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
                 filterMaskBits: COLLISION_FILTER_GROUPS.mob,
             },
+        }, {
+            shape: BodyShape.box,
+            hx: boxSize.width,
+            hy: boxSize.length,
+            center: [0, boxSize.offset],
+            fixtureOptions: {
+                isSensor: true,
+                filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
+                filterMaskBits: COLLISION_FILTER_GROUPS.mob,
+            },
         }],
     }), {
+        applyAngle: true,
         onCollideStart: onLargeCollideStart,
         onCollideEnd: onLargeCollideEnd,
     })

@@ -1,11 +1,13 @@
 import {proxy, useProxy} from "valtio";
 
 export const playerTargets = proxy<{
+    attackRange: number[],
     closeRange: number[],
     inRange: number[],
     targetID: number | null,
     lastAttacked: number | null,
 }>({
+    attackRange: [],
     closeRange: [],
     inRange: [],
     targetID: null,
@@ -48,5 +50,16 @@ export const removeFromPlayerCloseRange = (mobID: number) => {
     const index = playerTargets.closeRange.indexOf(mobID)
     if (index >= 0) {
         playerTargets.closeRange.splice(index, 1)
+    }
+}
+
+export const addToPlayerAttackRange = (mobID: number) => {
+    playerTargets.attackRange.push(mobID)
+}
+
+export const removeFromPlayerAttackRange = (mobID: number) => {
+    const index = playerTargets.attackRange.indexOf(mobID)
+    if (index >= 0) {
+        playerTargets.attackRange.splice(index, 1)
     }
 }

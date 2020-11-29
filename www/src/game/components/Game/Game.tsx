@@ -14,6 +14,7 @@ import Mob from "../Mob/Mob";
 import GameUI from "./components/GameUI/GameUI";
 import AttackColliders from "./components/AttackColliders/AttackColliders";
 import nipplejs from "nipplejs";
+import TestBox from "../TestBox/TestBox";
 
 const StyledContainer = styled.div`
     position: fixed;
@@ -57,6 +58,7 @@ const Game: React.FC = () => {
                             <Mob id={5} x={10} y={10}/>
                             <AttackColliders/>
                             <Stats/>
+                            {/*<TestBox/>*/}
                         </Physics>
                     </Canvas>
                 </Joystick>
