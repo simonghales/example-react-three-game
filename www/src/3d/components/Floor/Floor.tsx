@@ -4,7 +4,7 @@ import {radians} from "../../../utils/angles";
 
 const size = 100
 
-const floorColor = '#c77f47'
+const floorColor = '#2f313c'
 
 const Floor: React.FC = () => {
     return (

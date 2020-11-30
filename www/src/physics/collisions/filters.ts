@@ -4,4 +4,5 @@ export const COLLISION_FILTER_GROUPS = {
     mob: 0x0004,
     attackCollider: 0x0008,
     attackReceiver: 0x0016,
+    barrier: 0x0032,
 }

@@ -5,7 +5,7 @@ import {gameRefs} from "../../../state/refs";
 const Lights: React.FC = () => {
     return (
         <>
-            <ambientLight intensity={0.85}/>
+            <ambientLight intensity={0.95}/>
         </>
     );
 };

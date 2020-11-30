@@ -47,13 +47,13 @@ const skinMaterial = new MeshToonMaterial({
 skinMaterial.color.convertSRGBToLinear();
 
 const armorMaterial = new MeshToonMaterial({
-    color: hexStringToCode("#393939"),
+    color: hexStringToCode("#434e5f"),
     skinning: true,
 });
 armorMaterial.color.convertSRGBToLinear();
 
 const armorDarkMaterial = new MeshToonMaterial({
-    color: hexStringToCode("#242424"),
+    color: hexStringToCode("#242937"),
     skinning: true,
 });
 armorDarkMaterial.color.convertSRGBToLinear();

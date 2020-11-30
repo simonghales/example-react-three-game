@@ -24,7 +24,7 @@ const useAllowedMovementOffset = (): [number, number] => {
 
 const useCameraOffset = (): [number, number] => {
     const portrait = useIsPortrait()
-    return portrait ? [80, 75] : [75, 75]
+    return portrait ? [90, 90] : [75, 75]
 }
 
 const Camera: React.FC = () => {
@@ -133,10 +133,10 @@ const Camera: React.FC = () => {
     })
 
     return (
-        <perspectiveCamera ref={ref} fov={10} position={[0, cameraYOffset, -cameraZOffset]} near={75} far={125}>
+        <perspectiveCamera ref={ref} fov={10} position={[0, cameraYOffset, -cameraZOffset]} near={75} far={150}>
             <directionalLight
                 ref={lightRef}
-                intensity={0.6}
+                intensity={0.4}
                 position={[50, cameraYOffset + 1, cameraZOffset + 100]}
                 shadow-mapSize-width={2048}
                 shadow-mapSize-height={2048}

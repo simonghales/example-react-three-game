@@ -13,14 +13,17 @@ const StyledContainer = styled.div`
     z-index: 9999999;
 `;
 
-const StyledBar = styled.div`
+const StyledBar = styled.div<{
+    full: boolean,
+}>`
     width: 100%;
     max-width: 200px;
     height: 14px;
     border: 2px solid white;
-    opacity: 0.5;
+    opacity: ${props => props.full ? 0 : 0.5};
     overflow: hidden;
     position: relative;
+    transition: opacity 300ms ${props => props.full ? "200ms" : ""} ease;
 `;
 
 const StyledBarInner = styled.div`
@@ -54,7 +57,7 @@ const StatsUI: React.FC = () => {
 
     return (
         <StyledContainer>
-            <StyledBar>
+            <StyledBar full={full}>
                 <StyledBarInner ref={barRef}/>
             </StyledBar>
         </StyledContainer>

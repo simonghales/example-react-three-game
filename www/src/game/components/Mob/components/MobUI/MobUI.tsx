@@ -13,10 +13,11 @@ const StyledContainer = styled.div<{
 }>`
     width: 50px;
     height: 10px;
-    background-color: rgba(255,255,255,0.5);
+    background-color: rgba(0,0,0,0.25);
     position: relative;
     overflow: hidden;
     transition: opacity 500ms 250ms ease;
+    opacity: 0.75;
     ${props => props.hide ? cssHide : ''};
 `;
 
@@ -28,7 +29,7 @@ const StyledAmount = styled.div<{
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: red;
+    background-color: #980623;
     transition: all 200ms ease;
     transform: translateX(${props => (props.amount - 100)}%);
 `;
