@@ -12,8 +12,9 @@ import {Vec2} from "planck-js";
 import {usePlayerPhysics} from "./hooks/physics";
 import PlayerVisuals, {playerState} from "./components/PlayerVisuals/PlayerVisuals";
 import PlayerDebug from "./components/PlayerDebug/PlayerDebug";
-import {usePlayerHasTarget} from "../../../state/player";
+import {playerEnergy, usePlayerHasTarget} from "../../../state/player";
 import {usePlayerCollisionsHandler} from "./hooks/collisions";
+import {usePlayerEffectsHandler} from "./hooks/effects";
 
 const coroutine = (f: any, params = undefined) => {
     const o = f(params); // instantiate the coroutine
@@ -79,6 +80,7 @@ const Player: React.FC = () => {
 
     usePlayerCollisionsHandler(api)
     usePlayerControls()
+    usePlayerEffectsHandler()
     const targetLocked = usePlayerHasTarget()
 
     useEffect(() => {
@@ -151,6 +153,7 @@ const Player: React.FC = () => {
 
         let xVel = numLerp(playerJoystickVelocity.previousX, playerJoystickVelocity.x, 0.75)
         let yVel = numLerp(playerJoystickVelocity.previousY, playerJoystickVelocity.y, 0.75)
+        let energy = playerEnergy.energy
 
         if (!nippleState.active) {
             let up = inputsState[InputKeys.UP].active
@@ -168,7 +171,7 @@ const Player: React.FC = () => {
         }
 
         const isMoving = xVel !== 0 || yVel !== 0
-        const isRunning = inputsState[InputKeys.SHIFT].active
+        const isRunning = inputsState[InputKeys.SHIFT].active && !targetLocked && energy > 0
 
         if (!!rollManager.cooldownCoroutine) {
             if (rollManager.cooldownCoroutine().done) {
@@ -176,7 +179,7 @@ const Player: React.FC = () => {
             }
         }
 
-        const isRolling = isRunning && targetLocked && !playerState.rollCooldown
+        const isRolling = inputsState[InputKeys.SHIFT].active && targetLocked && !playerState.rollCooldown && energy >= 33
         const ongoingRoll = !!rollManager.rollCoroutine
 
         if (ongoingRoll) {
@@ -208,6 +211,11 @@ const Player: React.FC = () => {
             if (isRolling) {
 
                 rollManager.rollCoroutine = coroutine(rollCoroutine)
+                energy -= 33
+
+            } else if (isRunning) {
+
+                energy -= delta * 15
 
             }
 
@@ -250,6 +258,12 @@ const Player: React.FC = () => {
         if (playerState.running !== isRunning) {
             playerState.running = isRunning
         }
+
+        if (energy < 0) {
+            energy = 0
+        }
+
+        playerEnergy.energy = energy
 
         playerPosition.x = x
         playerPosition.y = y

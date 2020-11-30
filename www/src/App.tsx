@@ -1,11 +1,13 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 import Game from "./game/components/Game/Game";
+import {GlobalStyle} from "./ui/global";
 
 function App() {
   return (
-    <Game/>
+      <>
+        <GlobalStyle/>
+        <Game/>
+    </>
   );
 }
 

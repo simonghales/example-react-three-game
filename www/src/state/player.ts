@@ -1,5 +1,11 @@
 import {proxy, useProxy} from "valtio";
 
+export const playerEnergy = proxy<{
+    energy: number,
+}>({
+    energy: 100,
+})
+
 export const playerTargets = proxy<{
     attackRange: number[],
     closeRange: number[],

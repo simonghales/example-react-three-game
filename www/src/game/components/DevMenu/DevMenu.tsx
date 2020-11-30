@@ -5,8 +5,8 @@ import {devState} from "../../../state/dev";
 
 const StyledContainer = styled.div`
     position: absolute;
-    top: 10px;
-    right: 10px;
+    bottom: 10px;
+    left: 10px;
 `;
 
 const StyledFullscreen = styled.button`

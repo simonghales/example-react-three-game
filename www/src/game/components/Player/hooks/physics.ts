@@ -15,8 +15,8 @@ export const largeColliderRadius = 12
 export const smallColliderRadius = 4.5
 export const boxSize = {
     width: 2.5,
-    length: 2,
-    offset: 1,
+    length: 2.2,
+    offset: 1.1,
 }
 
 const tempVec2 = Vec2(0, 0)

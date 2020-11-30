@@ -16,6 +16,9 @@ import AttackColliders from "./components/AttackColliders/AttackColliders";
 import nipplejs from "nipplejs";
 import TestBox from "../TestBox/TestBox";
 
+
+export const STATS_CSS_CLASS = 'stats'
+
 const StyledContainer = styled.div`
     position: fixed;
     top: 0;
@@ -57,7 +60,7 @@ const Game: React.FC = () => {
                             <Mob id={4} x={0} y={10}/>
                             <Mob id={5} x={10} y={10}/>
                             <AttackColliders/>
-                            <Stats/>
+                            <Stats className={STATS_CSS_CLASS}/>
                             {/*<TestBox/>*/}
                         </Physics>
                     </Canvas>

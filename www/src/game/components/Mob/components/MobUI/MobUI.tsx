@@ -11,8 +11,8 @@ const cssHide = css`
 const StyledContainer = styled.div<{
     hide: boolean,
 }>`
-    width: 100px;
-    height: 20px;
+    width: 50px;
+    height: 10px;
     background-color: rgba(255,255,255,0.5);
     position: relative;
     overflow: hidden;
