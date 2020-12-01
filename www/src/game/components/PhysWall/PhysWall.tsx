@@ -1,4 +1,4 @@
-import React, {useEffect} from "react"
+import React, {Suspense, useEffect} from "react"
 import Wall from "../../../3d/models/Wall/Wall";
 import {useBody} from "../../../physics/components/Physics/hooks";
 import {BodyShape, BodyType} from "../../../physics/bodies";
@@ -24,7 +24,7 @@ const PhysWall: React.FC = () => {
     }), {})
 
     return (
-        <>
+        <Suspense fallback={null}>
             <Wall position={[-4, 0, 16]}/>
             <Wall position={[4, 0, 16]}/>
             <Wall position={[0, 0, 16]}/>
@@ -34,7 +34,7 @@ const PhysWall: React.FC = () => {
             <Wall position={[12, 0, 16]}/>
             <Wall position={[-16, 0, 16]}/>
             <Wall position={[16, 0, 16]}/>
-        </>
+        </Suspense>
     )
 }
 
