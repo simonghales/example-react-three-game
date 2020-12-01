@@ -24,8 +24,8 @@ export default function Wall(props: JSX.IntrinsicElements['group']) {
   return (
     <group ref={group} {...props} dispose={null}>
       <group userData={{ name: 'wall' }}>
-        <mesh material={materials.Stone} geometry={nodes.Cube4530.geometry} castShadow receiveShadow />
-        <mesh material={materials.StoneDark} geometry={nodes['Cube.4530_1'].geometry} castShadow receiveShadow />
+        <mesh material={materials.Stone} geometry={nodes.Cube4530.geometry} receiveShadow />
+        <mesh material={materials.StoneDark} geometry={nodes['Cube.4530_1'].geometry} receiveShadow />
       </group>
     </group>
   )

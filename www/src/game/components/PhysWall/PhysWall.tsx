@@ -4,6 +4,7 @@ import {useBody} from "../../../physics/components/Physics/hooks";
 import {BodyShape, BodyType} from "../../../physics/bodies";
 import {Vec2} from "planck-js";
 import {COLLISION_FILTER_GROUPS} from "../../../physics/collisions/filters";
+import WallMesh from "../../../3d/components/WallMesh/WallMesh";
 
 const PhysWall: React.FC = () => {
 
@@ -24,17 +25,17 @@ const PhysWall: React.FC = () => {
     }), {})
 
     return (
-        <Suspense fallback={null}>
-            <Wall position={[-4, 0, 16]}/>
-            <Wall position={[4, 0, 16]}/>
-            <Wall position={[0, 0, 16]}/>
-            <Wall position={[-8, 0, 16]}/>
-            <Wall position={[8, 0, 16]}/>
-            <Wall position={[-12, 0, 16]}/>
-            <Wall position={[12, 0, 16]}/>
-            <Wall position={[-16, 0, 16]}/>
-            <Wall position={[16, 0, 16]}/>
-        </Suspense>
+        <>
+            <WallMesh position={[-4, 0, 16]}/>
+            <WallMesh position={[4, 0, 16]}/>
+            <WallMesh position={[0, 0, 16]}/>
+            <WallMesh position={[-8, 0, 16]}/>
+            <WallMesh position={[8, 0, 16]}/>
+            <WallMesh position={[-12, 0, 16]}/>
+            <WallMesh position={[12, 0, 16]}/>
+            <WallMesh position={[-16, 0, 16]}/>
+            <WallMesh position={[16, 0, 16]}/>
+        </>
     )
 }
 

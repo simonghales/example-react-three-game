@@ -27,6 +27,23 @@ const useCameraOffset = (): [number, number] => {
     return portrait ? [90, 90] : [75, 75]
 }
 
+const useCameraShadowBounds = (portrait: boolean): [left: number, right: number, top: number, bottom: number] => {
+    if (portrait) {
+        return [
+            10,
+            70,
+            65,
+            0
+        ]
+    }
+    return [
+        25,
+        75,
+        45,
+        0
+    ]
+}
+
 const Camera: React.FC = () => {
     const lightRef: any = useResource()
     const ref = useRef<any>()
@@ -35,6 +52,8 @@ const Camera: React.FC = () => {
     const inDanger = useEnemiesInRange()
     const [allowedX, allowedY] = useAllowedMovementOffset()
     const [cameraYOffset, cameraZOffset] = useCameraOffset()
+    const portrait = useIsPortrait()
+    const [shadowLeft, shadowRight, shadowTop, shadowBottom] = useCameraShadowBounds(portrait)
 
     useEffect(() => void setDefaultCamera(ref.current), [])
 
@@ -140,10 +159,10 @@ const Camera: React.FC = () => {
                 position={[50, cameraYOffset + 1, cameraZOffset + 100]}
                 shadow-mapSize-width={2048}
                 shadow-mapSize-height={2048}
-                shadowCameraLeft={25}
-                shadowCameraRight={75}
-                shadowCameraTop={45}
-                shadowCameraBottom={0}
+                shadowCameraLeft={shadowLeft}
+                shadowCameraRight={shadowRight}
+                shadowCameraTop={shadowTop}
+                shadowCameraBottom={shadowBottom}
                 shadowCameraNear={250}
                 shadowCameraFar={400}
                 castShadow
