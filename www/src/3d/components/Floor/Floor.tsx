@@ -12,7 +12,7 @@ const Floor: React.FC = () => {
             <Plane args={[size, size]} rotation={[radians(-90), 0, 0]} receiveShadow>
                 <meshPhongMaterial attach="material" color={floorColor}/>
             </Plane>
-            {/*<gridHelper args={[size, size]}/>*/}
+            <gridHelper args={[size, size]}/>
         </>
     );
 };

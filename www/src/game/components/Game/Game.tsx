@@ -18,6 +18,7 @@ import TestBox from "../TestBox/TestBox";
 import Wall from "../../../3d/models/Wall/Wall";
 import WallCorner from "../../../3d/models/WallCorner/WallCorner";
 import PhysWall from "../PhysWall/PhysWall";
+import Room from "../Room/Room";
 
 
 export const STATS_CSS_CLASS = 'stats'
@@ -64,7 +65,8 @@ const Game: React.FC = () => {
                             <Mob id={5} x={10} y={10}/>
                             <AttackColliders/>
                             <Stats className={STATS_CSS_CLASS}/>
-                            <PhysWall/>
+                            <Room/>
+                            {/*<PhysWall/>*/}
                             {/*<TestBox/>*/}
                         </Physics>
                     </Canvas>
