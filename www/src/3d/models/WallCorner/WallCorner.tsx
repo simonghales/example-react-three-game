@@ -24,8 +24,8 @@ export default function WallCorner(props: JSX.IntrinsicElements['group']) {
   return (
     <group ref={group} {...props} dispose={null}>
       <group userData={{ name: 'wallCorner' }}>
-        <mesh material={materials.Stone} geometry={nodes.Cube4531.geometry} />
-        <mesh material={materials.StoneDark} geometry={nodes['Cube.4531_1'].geometry} />
+        <mesh material={materials.Stone} geometry={nodes.Cube4531.geometry} receiveShadow  position={[0.0001, 0.0001, 0.0001]} />
+        <mesh material={materials.StoneDark} geometry={nodes['Cube.4531_1'].geometry} receiveShadow />
       </group>
     </group>
   )
