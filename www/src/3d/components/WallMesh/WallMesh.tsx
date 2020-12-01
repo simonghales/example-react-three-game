@@ -8,8 +8,8 @@ const WallMesh: React.FC<JSX.IntrinsicElements['group']> = (props) => {
             <Suspense fallback={null}>
                 <Wall/>
             </Suspense>
-            <Box args={[4, 8, 1]} castShadow>
-                <meshBasicMaterial color="red" colorWrite={false} />
+            <Box args={[4, 8, 1]} castShadow renderOrder={Infinity}>
+                <meshBasicMaterial color="red" colorWrite={false} depthWrite={false} transparent />
             </Box>
         </group>
     );
