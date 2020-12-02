@@ -5,15 +5,23 @@ const room: {
     height: number;
     door: RoomDoor;
 } = {
-    width: 20,
-    height: 15,
+    width: 30,
+    height: 25,
     door: [
         [5, 0],
         [7, 0]
     ]
 };
 
+export enum RoomDirection {
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+}
+
 export type RoomWallMdl = {
+    direction: RoomDirection,
     start: [number, number];
     end: [number, number];
 };
@@ -30,7 +38,8 @@ const spaceIsClear = (x: number, y: number, door: RoomDoor): boolean => {
 const getWalls = (
     [startX, startY]: [number, number],
     [endX, endY]: [number, number],
-    door: RoomDoor
+    door: RoomDoor,
+    direction: RoomDirection,
 ): RoomWallMdl[] => {
     let walls: RoomWallMdl[] = [];
 
@@ -43,6 +52,7 @@ const getWalls = (
     const addCurrentWall = (x: number, y: number) => {
         if (currentWall) {
             walls.push({
+                direction,
                 start: currentWall.start,
                 end: [x, y]
             });
@@ -92,14 +102,14 @@ const getWalls = (
 const getRoomWalls = (): RoomWallMdl[] => {
     let walls: RoomWallMdl[] = [];
 
-    walls.push(...getWalls([0, 0], [room.width, 0], room.door));
+    walls.push(...getWalls([0, 0], [room.width, 0], room.door, RoomDirection.NORTH));
     walls.push(
-        ...getWalls([room.width, 0], [room.width, room.height], room.door)
+        ...getWalls([room.width, 0], [room.width, room.height], room.door, RoomDirection.EAST)
     );
     walls.push(
-        ...getWalls([room.width, room.height], [0, room.height], room.door)
+        ...getWalls([room.width, room.height], [0, room.height], room.door, RoomDirection.SOUTH)
     );
-    walls.push(...getWalls([0, room.height], [0, 0], room.door));
+    walls.push(...getWalls([0, room.height], [0, 0], room.door, RoomDirection.WEST));
 
     return walls;
 };
