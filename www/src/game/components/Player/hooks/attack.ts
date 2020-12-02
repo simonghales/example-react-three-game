@@ -38,7 +38,6 @@ export const usePlayerAttackHandler = () => {
 
             attackState.lastAttack = Date.now()
             setTimeout(() => {
-                console.log('playerTargets', playerTargets.attackRange)
                 playerTargets.attackRange.forEach((mobID, index) => {
                     if (index === 0) {
                         playerTargets.lastAttacked = mobID
@@ -48,23 +47,6 @@ export const usePlayerAttackHandler = () => {
                     manager.health = manager.health - 25
                     manager.lastHit = Date.now()
                 })
-                /*
-                const {x, y, angle} = playerPosition
-                const vX = Math.sin(angle)
-                const vY = Math.cos(angle)
-                const attackX = x + (vX * 1.25)
-                const attackY = y + (vY * 1.25)
-                attackCount += 1
-                const id = attackCount
-                attackColliders.colliders.push({
-                    id,
-                    x: attackX,
-                    y: attackY,
-                    vX,
-                    vY,
-                    expires: Date.now() + 100,
-                })
-                 */
             }, 200)
         }
     }, )

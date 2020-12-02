@@ -5,4 +5,5 @@ export const COLLISION_FILTER_GROUPS = {
     attackCollider: 0x0008,
     attackReceiver: 0x0016,
     barrier: 0x0032,
+    physical: 0x0064,
 }

@@ -42,7 +42,7 @@ const Room: React.FC = () => {
                 center: [xStart, yStart],
                 fixtureOptions: {
                     filterCategoryBits: COLLISION_FILTER_GROUPS.barrier,
-                    filterMaskBits: COLLISION_FILTER_GROUPS.player,
+                    filterMaskBits: COLLISION_FILTER_GROUPS.physical,
                 }
             }
         }),

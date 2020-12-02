@@ -85,16 +85,6 @@ const Player: React.FC = () => {
 
     useEffect(() => {
         gameRefs.player = ref.current
-
-        //largeColliderApi.setAngle(radians(45))
-        //console.log('radians(45)', radians(45))
-        //console.log('radians', radians(90)) 1.57
-
-        /*setInterval(() => {
-            largeColliderApi.setAngle(radians(thing ? 90 : 0))
-            thing = !thing
-        }, 5000)*/
-
     }, [])
 
     useEffect(() => {

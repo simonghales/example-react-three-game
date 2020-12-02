@@ -135,12 +135,12 @@ export const addBody = ({uuid, cacheKey, listenForCollisions, fixtures = [], ...
             fixtures.forEach(({shape, fixtureOptions, hx, hy, radius, center}, fixtureIndex) => {
 
                 fixtureOptions = {
+                    ...fixtureOptions,
                     userData: {
                         uuid,
                         fixtureIndex,
                         ...fixtureOptions?.userData
                     },
-                    ...fixtureOptions,
                 }
 
                 let bodyShape: Shape;

@@ -19,6 +19,7 @@ import Wall from "../../../3d/models/Wall/Wall";
 import WallCorner from "../../../3d/models/WallCorner/WallCorner";
 import PhysWall from "../PhysWall/PhysWall";
 import Room from "../Room/Room";
+import GameAI from "./components/GameAI/GameAI";
 
 
 export const STATS_CSS_CLASS = 'stats'
@@ -51,6 +52,7 @@ const Game: React.FC = () => {
             <StyledContainer>
                 <Joystick>
                     <Canvas onPointerMissed={() => console.log('missed?')} concurrent shadowMap>
+                        <GameAI/>
                         <Physics>
                             <Camera/>
                             <Lights/>

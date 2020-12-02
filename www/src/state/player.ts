@@ -31,6 +31,7 @@ export const usePlayerTarget = (): number | null => {
         return lastAttacked
     }
     if (closeRange.length > 0) {
+        console.log('closeRange?', closeRange[0], closeRange)
         return closeRange[0]
     }
     return null
@@ -38,7 +39,9 @@ export const usePlayerTarget = (): number | null => {
 }
 
 export const usePlayerHasTarget = (): boolean => {
-    return usePlayerTarget() !== null
+    const target = usePlayerTarget()
+    console.log('target', target)
+    return target !== null
 }
 
 export const removePlayerFromRange = (mobID: number) => {
@@ -49,10 +52,12 @@ export const removePlayerFromRange = (mobID: number) => {
 }
 
 export const addToPlayerCloseRange = (mobID: number) => {
+    console.log('addToPlayerCloseRange', mobID)
     playerTargets.closeRange.push(mobID)
 }
 
 export const removeFromPlayerCloseRange = (mobID: number) => {
+    console.log('removeFromPlayerCloseRange', mobID)
     const index = playerTargets.closeRange.indexOf(mobID)
     if (index >= 0) {
         playerTargets.closeRange.splice(index, 1)

@@ -11,7 +11,7 @@ const IndividualWall: React.FC<{
 }> = ({position, index, vertical}) => {
     return (
         <group position={[position, index / 10000, index / 10000]}>
-            <Box position={[(4 / 2), 0, 0]} args={[4, 8, 1.4]} castShadow>
+            <Box position={[(4 / 2), 0, 0]} args={[4, 8, 1]} castShadow>
                 <meshBasicMaterial depthWrite={false} colorWrite={false} />
             </Box>
             <Suspense fallback={null}>
@@ -52,10 +52,8 @@ const RoomWall: React.FC<{
             {Array.from({ length: numberOfWalls }).map((_, wallIndex) => {
                 let position = wallIndex * 4;
                 if (wallIndex === numberOfWalls - 1 && wallRemainder !== 4) {
-                    console.log('reduce position', wallIndex, position, wallRemainder)
                     position -= wallRemainder;
                 }
-                console.log('position', position)
                 return <IndividualWall position={position} index={wallIndex} key={wallIndex} vertical={!horizontal} />;
             })}
         </group>

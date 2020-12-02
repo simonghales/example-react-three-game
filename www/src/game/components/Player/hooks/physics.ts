@@ -10,6 +10,7 @@ import {
     removeFromPlayerCloseRange,
     removePlayerFromRange
 } from "../../../../state/player";
+import {FixtureType} from "../../../../physics/collisions/types";
 
 export const largeColliderRadius = 12
 export const smallColliderRadius = 4.5
@@ -32,13 +33,15 @@ export const usePlayerPhysics = () => {
     }, [])
 
     const onLargeCollideStart = useCallback((data: any, fixtureIndex: number) => {
-        const mobID = data.mobID
-        if (fixtureIndex === 0) {
-            playerTargets.inRange.push(mobID)
-        } else if (fixtureIndex === 1) {
-            addToPlayerCloseRange(mobID)
-        } else if (fixtureIndex === 2) {
-            addToPlayerAttackRange(mobID)
+        const {mobID, type} = data
+        if (type === FixtureType.MOB) {
+            if (fixtureIndex === 0) {
+                playerTargets.inRange.push(mobID)
+            } else if (fixtureIndex === 1) {
+                addToPlayerCloseRange(mobID)
+            } else if (fixtureIndex === 2) {
+                addToPlayerAttackRange(mobID)
+            }
         }
     }, [])
 
@@ -59,7 +62,7 @@ export const usePlayerPhysics = () => {
             shape: BodyShape.circle,
             radius: 0.75,
             fixtureOptions: {
-                filterCategoryBits: COLLISION_FILTER_GROUPS.player,
+                filterCategoryBits: COLLISION_FILTER_GROUPS.player | COLLISION_FILTER_GROUPS.physical,
             }
         }],
     }), {
@@ -79,6 +82,9 @@ export const usePlayerPhysics = () => {
                 isSensor: true,
                 filterCategoryBits: COLLISION_FILTER_GROUPS.playerTrigger,
                 filterMaskBits: COLLISION_FILTER_GROUPS.mob,
+                userData: {
+                    type: FixtureType.PLAYER_RANGE,
+                }
             },
         }, {
             shape: BodyShape.circle,

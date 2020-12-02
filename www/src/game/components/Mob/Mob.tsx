@@ -6,6 +6,8 @@ import MobTargetTracking from "./components/MobTargetTracking/MobTargetTracking"
 import {useProxy} from "valtio";
 import {usePlayerTarget} from "../../../state/player";
 import {deleteMobHealthManager, getMobHealthManager, initMobHealthManager} from "../../../state/mobs";
+import {addMob, removeMob, updateMob} from "../../../temp/ai";
+import {useMobBrain} from "./hooks/brain";
 
 const useIsTargeted = (id: number): boolean => {
     const targetID = usePlayerTarget()
@@ -29,6 +31,14 @@ const MobInner: React.FC<{
     const isTargeted = useIsTargeted(id)
     const isDead = useIsDead(id)
     const managerProxy = useProxy(getMobHealthManager(id))
+
+    useEffect(() => {
+
+        updateMob(id, {
+            alive: !isDead,
+        })
+
+    }, [id, isDead])
 
     return (
         <>
@@ -56,11 +66,13 @@ const Mob: React.FC<{
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
+        addMob(id)
         initMobHealthManager(id)
         setMounted(true)
 
         return () => {
             deleteMobHealthManager(id)
+            removeMob(id)
         }
     }, [])
 

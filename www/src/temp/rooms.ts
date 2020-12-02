@@ -9,7 +9,7 @@ const room: {
     height: 25,
     door: [
         [5, 0],
-        [7, 0]
+        [8, 0]
     ]
 };
 
