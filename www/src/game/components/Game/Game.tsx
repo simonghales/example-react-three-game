@@ -62,6 +62,9 @@ const Game: React.FC = () => {
                             <Mob id={0} x={6} y={10}/>
                             <Mob id={1} x={12} y={10}/>
                             <Mob id={2} x={18} y={10}/>
+                            <Mob id={3} x={6} y={13}/>
+                            <Mob id={4} x={12} y={13}/>
+                            <Mob id={5} x={18} y={13}/>
                             <AttackColliders/>
                             <Stats className={STATS_CSS_CLASS}/>
                             <Room/>
