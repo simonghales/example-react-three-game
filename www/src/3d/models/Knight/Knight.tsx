@@ -61,9 +61,10 @@ armorDarkMaterial.color.convertSRGBToLinear();
 type ActionName = 'Idle' | 'PickUp' | 'Punch' | 'RecieveHit' | 'Run' | 'SitDown' | 'Walk'
 type GLTFActions = Record<ActionName, AnimationAction>
 
-export default function Knight({moving, running, lastAttack, ...props}: JSX.IntrinsicElements['group'] & {
+export default function Knight({moving, running, lastDamaged, lastAttack, ...props}: JSX.IntrinsicElements['group'] & {
     moving: boolean,
     running: boolean,
+    lastDamaged: number,
     lastAttack: number,
 }) {
   const group = useRef<Group>()
@@ -96,6 +97,9 @@ export default function Knight({moving, running, lastAttack, ...props}: JSX.Intr
     actions.current.Punch.loop = LoopOnce
     actions.current.Punch.clampWhenFinished = true
     actions.current.Punch.timeScale = 1.2
+    actions.current.RecieveHit.loop = LoopOnce
+    actions.current.RecieveHit.clampWhenFinished = true
+    actions.current.RecieveHit.timeScale = 1.2
     return () => animations.forEach((clip) => mixer.uncacheClip(clip))
   }, [])
 
@@ -129,20 +133,24 @@ export default function Knight({moving, running, lastAttack, ...props}: JSX.Intr
                 currentAnimation.finished = false
             }
 
-            const isHit = lastAttack > Date.now() - 100
-            const key = lastAttack.toString()
+            const isHit = lastDamaged > Date.now() - 100
+            const isAttacking = lastAttack > Date.now() - 100
+            const attackKey = lastAttack.toString()
+            const hitKey = lastDamaged.toString()
 
-            if (isHit || (currentAnimation.key === key && !currentAnimation.finished)) {
+            const processAnimation = (key: string, animation: any) => {
+
+                if (!actions.current) return
 
                 if (currentAnimation.animation && currentAnimation.key === key) {
-                    //
+
                 } else {
-                    playAnimation(actions.current.Punch, quickDuration, quickDuration, key)
+                    playAnimation(animation, quickDuration, quickDuration, key)
                 }
 
                 const onFinished = (event: Event) => {
                     mixer.removeEventListener('finished', onFinished)
-                    if (actions.current && event.action === actions.current.Punch) {
+                    if (actions.current && event.action === animation) {
                         currentAnimation.finished = true
                         calculateAnimation()
                     }
@@ -153,6 +161,15 @@ export default function Knight({moving, running, lastAttack, ...props}: JSX.Intr
                 unsubscribe = () => {
                     mixer.removeEventListener('finished', onFinished)
                 }
+            }
+
+            if (isAttacking || (currentAnimation.key === attackKey && !currentAnimation.finished)) {
+
+                processAnimation(attackKey, actions.current.Punch)
+
+            } else if (isHit || (currentAnimation.key === hitKey && !currentAnimation.finished)) {
+
+                processAnimation(hitKey, actions.current.RecieveHit)
 
             } else {
 
@@ -178,7 +195,7 @@ export default function Knight({moving, running, lastAttack, ...props}: JSX.Intr
             unsubscribe()
         }
 
-    }, [moving, running, lastAttack])
+    }, [moving, running, lastAttack, lastDamaged])
 
   return (
     <group ref={group} {...props} dispose={null}>

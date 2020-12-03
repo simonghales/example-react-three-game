@@ -26,6 +26,7 @@ const attackPlayerCoroutine = function* () {
             newPlayerHealth = 0
         }
         playerHealth.health = newPlayerHealth
+        playerHealth.lastDamaged = Date.now()
     }
 
 }
@@ -69,7 +70,6 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
             // api.applyForceToCenter(velocity)
             position.set(x, y)
             api.applyLinearImpulse(velocity, position)
-            console.log('apply impulse...')
             hits[manager.lastHit] = true
 
         } else if (manager.lastHit > now - 500) {

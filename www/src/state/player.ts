@@ -8,8 +8,10 @@ export const playerEnergy = proxy<{
 
 export const playerHealth = proxy<{
     health: number,
+    lastDamaged: number,
 }>({
     health: 100,
+    lastDamaged: 0,
 })
 
 export const playerTargets = proxy<{
@@ -37,7 +39,6 @@ export const usePlayerTarget = (): number | null => {
         return lastAttacked
     }
     if (closeRange.length > 0) {
-        console.log('closeRange?', closeRange[0], closeRange)
         return closeRange[0]
     }
     return null
