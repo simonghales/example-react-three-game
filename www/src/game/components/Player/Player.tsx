@@ -16,7 +16,7 @@ import {playerEnergy, usePlayerHasTarget} from "../../../state/player";
 import {usePlayerCollisionsHandler} from "./hooks/collisions";
 import {usePlayerEffectsHandler} from "./hooks/effects";
 
-const coroutine = (f: any, params = undefined) => {
+export const coroutine = (f: any, params = undefined) => {
     const o = f(params); // instantiate the coroutine
     return function (x: any) {
         return o.next(x);

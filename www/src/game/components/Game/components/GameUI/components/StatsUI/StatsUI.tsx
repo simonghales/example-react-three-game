@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
 import {subscribe, useProxy} from "valtio";
 import {playerEnergy} from "../../../../../../../state/player";
+import Health from "./Health/Health";
 
 const StyledContainer = styled.div`
     position: absolute;
@@ -56,11 +57,14 @@ const StatsUI: React.FC = () => {
     }, [])
 
     return (
-        <StyledContainer>
-            <StyledBar full={full}>
-                <StyledBarInner ref={barRef}/>
-            </StyledBar>
-        </StyledContainer>
+        <>
+            <Health/>
+            <StyledContainer>
+                <StyledBar full={full}>
+                    <StyledBarInner ref={barRef}/>
+                </StyledBar>
+            </StyledContainer>
+        </>
     );
 };
 

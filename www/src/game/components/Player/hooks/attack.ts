@@ -40,11 +40,12 @@ export const usePlayerAttackHandler = () => {
             attackState.lastAttack = Date.now()
             setTimeout(() => {
                 playerTargets.attackRange.forEach((mobID, index) => {
+                    const manager = getMobHealthManager(mobID)
+                    if (!manager) return
+                    if (manager.stunned) return
                     if (index === 0) {
                         playerTargets.lastAttacked = mobID
                     }
-                    const manager = getMobHealthManager(mobID)
-                    if (!manager) return
                     manager.health = manager.health - 25
                     manager.lastHit = Date.now()
                     const [enemyX, enemyY] = getMobPosition(mobID)

@@ -11,13 +11,14 @@ import {playerTargets} from "../../../../../state/player";
 
 const MobVisuals: React.FC<{
     lastHit: number,
+    lastAttacked: number,
     x: number,
     y: number,
     localRef: MutableRefObject<Object3D>,
     isDead: boolean,
     id: number,
     targeted: boolean,
-}> = ({localRef, lastHit, x, y, isDead, id, targeted}) => {
+}> = ({localRef, lastHit, lastAttacked, x, y, isDead, id, targeted}) => {
 
     const clickedTimestampsRef = useRef({
         lastClicked: 0,
@@ -53,7 +54,7 @@ const MobVisuals: React.FC<{
     return (
         <group ref={localRef} position={[x, 0, y]}>
             <Suspense fallback={null}>
-                <Demon isDead={isDead} lastHit={lastHit} position={[0, isDead ? 0 : 1, 0]} onClick={onClick}/>
+                <Demon isDead={isDead} lastHit={lastHit} lastAttacked={lastAttacked} position={[0, isDead ? 0 : 1, 0]} onClick={onClick}/>
             </Suspense>
             {/*<Cylinder args={[0.75, 0.75]}>*/}
             {/*    <meshBasicMaterial attach="material" color={"purple"} transparent*/}

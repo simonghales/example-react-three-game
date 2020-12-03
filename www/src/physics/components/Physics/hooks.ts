@@ -8,6 +8,8 @@ import {applyPositionAngle, buffers, collisionEndedEvents, collisionStartedEvent
 import {PhysicsCacheKeys} from "../../cache";
 
 export type BodyApi = {
+    applyForceToCenter: (vec: Vec2) => void,
+    applyLinearImpulse: (vec: Vec2, pos: Vec2) => void,
     setPosition: (vec: Vec2) => void,
     setLinearVelocity: (vec: Vec2) => void,
     setAngle: (angle: number) => void,
@@ -93,6 +95,12 @@ export const useBody = (propsFn: () => AddBodyDef, {
         const getUUID = () => uuid
 
         return  {
+            applyForceToCenter: (vec) => {
+                workerSetBody({uuid: getUUID(), method: 'applyForceToCenter', methodParams: [vec, true]})
+            },
+            applyLinearImpulse: (vec, pos) => {
+                workerSetBody({uuid: getUUID(), method: 'applyLinearImpulse', methodParams: [vec, pos, true]})
+            },
             setPosition: (vec) => {
                 workerSetBody({uuid: getUUID(), method: 'setPosition', methodParams: [vec]})
             },

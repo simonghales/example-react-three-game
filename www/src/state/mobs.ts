@@ -4,6 +4,7 @@ export type MobHealth = {
     stunned: boolean,
     health: number,
     lastHit: number,
+    lastAttacked: number,
     attackVector: [number, number]
 }
 
@@ -16,6 +17,7 @@ export const initMobHealthManager = (id: number): MobHealth => {
         stunned: false,
         health: 100,
         lastHit: 0,
+        lastAttacked: 0,
         attackVector: [0, 0]
     })
     mobsHealthManager[id] = manager

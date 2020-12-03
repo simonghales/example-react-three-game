@@ -6,10 +6,42 @@ import {playerPosition} from "../../../../state/positions";
 import {Vec2} from "planck-js";
 import {useProxy} from "valtio";
 import {getMobHealthManager} from "../../../../state/mobs";
+import {playerHealth} from "../../../../state/player";
+import {coroutine} from "../../Player/Player";
+
+const attackPlayerCoroutine = function* () {
+
+    const started = Date.now()
+
+    // wait 100ms
+    while (started > Date.now() - 100) {
+        yield null
+    }
+
+    if (started > Date.now() + 200) {
+        // too old, ignore
+    } else {
+        let newPlayerHealth = playerHealth.health - 5
+        if (newPlayerHealth < 0) {
+            newPlayerHealth = 0
+        }
+        playerHealth.health = newPlayerHealth
+    }
+
+}
 
 const velocity = Vec2(0, 0)
+const position = Vec2(0, 0)
 
 export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
+    const [coroutineManager] = useState<{
+        attack: any,
+    }>(() => ({
+        attack: null,
+    }))
+    const [hits] = useState<{
+        [id: number]: boolean,
+    }>(() => ({}))
     const [manager] = useState(() => getMobHealthManager(id))
     const managerProxy = useProxy(manager)
 
@@ -21,28 +53,56 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
     }))
     const [mobData] = useState(() => getMob(id))
 
-    useFrame(() => {
+    useFrame((state, delta) => {
 
         let xVel = 0
         let yVel = 0
 
-        if (manager.stunned) {
+        const x = ref.current.position.x
+        const y = ref.current.position.z
 
-            xVel = manager.attackVector[0] * 7.5
-            yVel = manager.attackVector[1] * 7.5
+        const now = Date.now()
+
+        if (manager.stunned && !hits[manager.lastHit]) {
+
+            velocity.set(manager.attackVector[0] * 150,  manager.attackVector[1] * 150)
+            // api.applyForceToCenter(velocity)
+            position.set(x, y)
+            api.applyLinearImpulse(velocity, position)
+            console.log('apply impulse...')
+            hits[manager.lastHit] = true
+
+        } else if (manager.lastHit > now - 500) {
+
+            // do nothing...
 
         } else {
 
             if (mobData.goal === MobAIGoal.ATTACK) {
 
-                const x = ref.current.position.x
-                const y = ref.current.position.z
-
                 const xDistance = x - playerPosition.x
                 const yDistance = y - playerPosition.y
 
                 if (Math.abs(xDistance) <= 2 && Math.abs(yDistance) <= 2) {
-                    // console.log('attack!')
+
+                    if (manager.lastAttacked < now - 1500) {
+
+                        manager.lastAttacked = now
+
+                        coroutineManager.attack = coroutine(attackPlayerCoroutine)
+
+                    }
+
+                    if (coroutineManager.attack) {
+
+                        const response = coroutineManager.attack()
+
+                        if (response.done) {
+                            coroutineManager.attack = null
+                        }
+
+                    }
+
                 } else {
                     if (x > playerPosition.x) {
                         xVel = -1.25
@@ -62,12 +122,13 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
 
         }
 
-        if (previousVelocities.xVel !== xVel || previousVelocities.yVel !== yVel) {
-            velocity.set(xVel, yVel)
-            api.setLinearVelocity(velocity)
+        // if (previousVelocities.xVel !== xVel || previousVelocities.yVel !== yVel) {
+            velocity.set(xVel * 300, yVel * 300)
+            api.applyForceToCenter(velocity)
+            // api.setLinearVelocity(velocity)
             previousVelocities.xVel = xVel
             previousVelocities.yVel = yVel
-        }
+        // }
 
         mobData.x = ref.current.position.x
         mobData.y = ref.current.position.z

@@ -6,6 +6,12 @@ export const playerEnergy = proxy<{
     energy: 100,
 })
 
+export const playerHealth = proxy<{
+    health: number,
+}>({
+    health: 100,
+})
+
 export const playerTargets = proxy<{
     attackRange: number[],
     closeRange: number[],

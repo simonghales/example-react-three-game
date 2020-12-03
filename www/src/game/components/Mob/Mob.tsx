@@ -47,7 +47,7 @@ const MobInner: React.FC<{
                     <MobPhysics x={x} y={y} id={id} localRef={localRef}/>
                 )
             }
-            <MobVisuals lastHit={managerProxy.lastHit} x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
+            <MobVisuals lastHit={managerProxy.lastHit} lastAttacked={managerProxy.lastAttacked} x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
             {
                 isTargeted && (
                     <MobTargetTracking localRef={localRef}/>
