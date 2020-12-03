@@ -5,6 +5,7 @@ import {playerPosition} from "../../../../state/positions";
 import {playerState} from "../components/PlayerVisuals/PlayerVisuals";
 import {playerTargets} from "../../../../state/player";
 import {getMobHealthManager} from "../../../../state/mobs";
+import {getMobPosition} from "../../../../temp/ai";
 
 let attackCount = 0
 
@@ -46,6 +47,16 @@ export const usePlayerAttackHandler = () => {
                     if (!manager) return
                     manager.health = manager.health - 25
                     manager.lastHit = Date.now()
+                    const [enemyX, enemyY] = getMobPosition(mobID)
+
+                    const angle = Math.atan2(enemyY - playerPosition.y, enemyX - playerPosition.x) * 180 / Math.PI;
+
+                    const xVector = Math.cos(angle)
+                    const yVector = Math.sin(angle)
+
+                    manager.attackVector = [xVector, yVector]
+                    console.log('angle', angle, xVector, yVector)
+                    // todo - get vector from player to enemy
                 })
             }, 200)
         }

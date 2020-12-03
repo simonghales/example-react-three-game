@@ -1,8 +1,10 @@
 import {proxy} from "valtio";
 
 export type MobHealth = {
+    stunned: boolean,
     health: number,
     lastHit: number,
+    attackVector: [number, number]
 }
 
 export const mobsHealthManager: {
@@ -11,8 +13,10 @@ export const mobsHealthManager: {
 
 export const initMobHealthManager = (id: number): MobHealth => {
     const manager = proxy<MobHealth>({
+        stunned: false,
         health: 100,
         lastHit: 0,
+        attackVector: [0, 0]
     })
     mobsHealthManager[id] = manager
     return manager

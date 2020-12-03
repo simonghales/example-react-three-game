@@ -13,6 +13,8 @@ export type MobData = {
     alive: boolean,
     inPlayerRange: boolean,
     goal: number,
+    x: number,
+    y: number,
 }
 
 export const mobsMap = new Map<number, MobData>()
@@ -22,6 +24,8 @@ export const addMob = (id: number) => {
         alive: true,
         inPlayerRange: false,
         goal: MobAIGoal.IDLE,
+        x: 0,
+        y: 0,
     })
 }
 
@@ -33,6 +37,11 @@ export const getMob = (id: number): MobData => {
     const mob = mobsMap.get(id)
     if (!mob) throw new Error(`Mob ${id} not found`)
     return mob
+}
+
+export const getMobPosition = (id: number): [number, number] => {
+    const mob = getMob(id)
+    return [mob.x, mob.y]
 }
 
 const processMob = (id: number, data: MobData) => {
