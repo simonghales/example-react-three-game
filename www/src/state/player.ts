@@ -20,13 +20,23 @@ export const playerTargets = proxy<{
     inRange: number[],
     targetID: number | null,
     lastAttacked: number | null,
+    lastHitBy: number | null,
 }>({
     attackRange: [],
     closeRange: [],
     inRange: [],
     targetID: null,
     lastAttacked: null,
+    lastHitBy: null,
 })
+
+export const getPlayerTargetedEnemy = (): number | null => {
+    const {lastAttacked, inRange} = playerTargets
+    if (lastAttacked !== null && inRange.includes(lastAttacked)) {
+        return lastAttacked
+    }
+    return null
+}
 
 export const useEnemiesInRange = (): boolean => {
     const {inRange: targets} = useProxy(playerTargets)
@@ -34,12 +44,15 @@ export const useEnemiesInRange = (): boolean => {
 }
 
 export const usePlayerTarget = (): number | null => {
-    const {inRange: targets, lastAttacked, closeRange} = useProxy(playerTargets)
-    if (lastAttacked !== null && targets.includes(lastAttacked)) {
+    const {inRange, lastAttacked, attackRange, lastHitBy} = useProxy(playerTargets)
+    if (lastAttacked !== null && inRange.includes(lastAttacked)) {
         return lastAttacked
     }
-    if (closeRange.length > 0) {
-        return closeRange[0]
+    if (lastHitBy !== null && inRange.includes(lastHitBy)) {
+        return lastHitBy
+    }
+    if (attackRange.length > 0) {
+        return attackRange[0]
     }
     return null
     // return targets.length > 0 ? targets[0] : null

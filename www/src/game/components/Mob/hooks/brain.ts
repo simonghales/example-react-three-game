@@ -6,7 +6,7 @@ import {playerPosition} from "../../../../state/positions";
 import {Vec2} from "planck-js";
 import {useProxy} from "valtio";
 import {getMobHealthManager} from "../../../../state/mobs";
-import {playerHealth} from "../../../../state/player";
+import {playerHealth, playerTargets} from "../../../../state/player";
 import {coroutine} from "../../Player/Player";
 
 const attackPlayerCoroutine = function* () {
@@ -18,7 +18,16 @@ const attackPlayerCoroutine = function* () {
         yield null
     }
 
-    if (started > Date.now() + 200) {
+    const attackStarted = Date.now()
+
+    yield true
+
+    // wait 100ms
+    while (attackStarted > Date.now() - 100) {
+        yield null
+    }
+
+    if (attackStarted > Date.now() + 200) {
         // too old, ignore
     } else {
         let newPlayerHealth = playerHealth.health - 5
@@ -35,6 +44,9 @@ const velocity = Vec2(0, 0)
 const position = Vec2(0, 0)
 
 export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
+    const [localState] = useState(() => ({
+        attackPending: false,
+    }))
     const [coroutineManager] = useState<{
         attack: any,
     }>(() => ({
@@ -85,10 +97,9 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
 
                 if (Math.abs(xDistance) <= 2 && Math.abs(yDistance) <= 2) {
 
-                    if (manager.lastAttacked < now - 1500) {
+                    if (manager.lastAttacked < now - 1500 && !localState.attackPending) {
 
-                        manager.lastAttacked = now
-
+                        localState.attackPending = true
                         coroutineManager.attack = coroutine(attackPlayerCoroutine)
 
                     }
@@ -97,13 +108,24 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
 
                         const response = coroutineManager.attack()
 
+                        if (response.value) {
+                            manager.lastAttacked = now
+                            localState.attackPending = false
+                        }
+
                         if (response.done) {
                             coroutineManager.attack = null
+                            if (playerTargets.lastHitBy === null || !playerTargets.inRange.includes(playerTargets.lastHitBy)) {
+                                playerTargets.lastHitBy = id
+                            }
                         }
 
                     }
 
                 } else {
+
+                    localState.attackPending = false
+
                     if (x > playerPosition.x) {
                         xVel = -1.25
                     } else if (x < playerPosition.x) {
