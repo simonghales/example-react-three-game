@@ -46,7 +46,7 @@ export const usePlayerAttackHandler = () => {
                     if (index === 0) {
                         playerTargets.lastAttacked = mobID
                     }
-                    manager.health = manager.health - 25
+                    manager.health = manager.health - 34
                     manager.lastHit = Date.now()
                     const [enemyX, enemyY] = getMobPosition(mobID)
 
