@@ -12,7 +12,7 @@ import {Vec2} from "planck-js";
 import {usePlayerPhysics} from "./hooks/physics";
 import PlayerVisuals, {playerState} from "./components/PlayerVisuals/PlayerVisuals";
 import PlayerDebug from "./components/PlayerDebug/PlayerDebug";
-import {playerEnergy, usePlayerHasTarget} from "../../../state/player";
+import {playerEnergy, usePlayerHasTarget, usePlayerInCombat} from "../../../state/player";
 import {usePlayerCollisionsHandler} from "./hooks/collisions";
 import {usePlayerEffectsHandler} from "./hooks/effects";
 
@@ -82,6 +82,7 @@ const Player: React.FC = () => {
     usePlayerControls()
     usePlayerEffectsHandler()
     const targetLocked = usePlayerHasTarget()
+    const inCombat = usePlayerInCombat()
 
     useEffect(() => {
         gameRefs.player = ref.current
@@ -161,7 +162,7 @@ const Player: React.FC = () => {
         }
 
         const isMoving = xVel !== 0 || yVel !== 0
-        const isRunning = inputsState[InputKeys.SHIFT].active && !targetLocked && energy > 0
+        const isRunning = inputsState[InputKeys.SHIFT].active && !inCombat && energy > 0
 
         if (!!rollManager.cooldownCoroutine) {
             if (rollManager.cooldownCoroutine().done) {
@@ -169,7 +170,7 @@ const Player: React.FC = () => {
             }
         }
 
-        const isRolling = inputsState[InputKeys.SHIFT].active && targetLocked && !playerState.rollCooldown && energy >= 33
+        const isRolling = inputsState[InputKeys.SHIFT].active && inCombat && !playerState.rollCooldown && energy >= 33
         const ongoingRoll = !!rollManager.rollCoroutine
 
         if (ongoingRoll) {

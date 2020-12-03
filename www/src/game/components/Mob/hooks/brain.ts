@@ -13,8 +13,8 @@ const attackPlayerCoroutine = function* () {
 
     const started = Date.now()
 
-    // wait 100ms
-    while (started > Date.now() - 100) {
+    // wait 500ms
+    while (started > Date.now() - 500) {
         yield null
     }
 
@@ -45,6 +45,7 @@ const position = Vec2(0, 0)
 
 export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
     const [localState] = useState(() => ({
+        attackInitiated: false,
         attackPending: false,
     }))
     const [coroutineManager] = useState<{
@@ -97,7 +98,7 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
 
                 if (Math.abs(xDistance) <= 2 && Math.abs(yDistance) <= 2) {
 
-                    if (manager.lastAttacked < now - 1500 && !localState.attackPending) {
+                    if (manager.lastAttacked < now - 1500 && !localState.attackPending && !localState.attackInitiated) {
 
                         localState.attackPending = true
                         coroutineManager.attack = coroutine(attackPlayerCoroutine)
@@ -111,9 +112,11 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
                         if (response.value) {
                             manager.lastAttacked = now
                             localState.attackPending = false
+                            localState.attackInitiated = true
                         }
 
                         if (response.done) {
+                            localState.attackInitiated = false
                             coroutineManager.attack = null
                             if (playerTargets.lastHitBy === null || !playerTargets.inRange.includes(playerTargets.lastHitBy)) {
                                 playerTargets.lastHitBy = id
@@ -125,6 +128,10 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
                 } else {
 
                     localState.attackPending = false
+
+                    if (coroutineManager.attack && !localState.attackInitiated) {
+                        coroutineManager.attack = null
+                    }
 
                     if (x > playerPosition.x) {
                         xVel = -1.25

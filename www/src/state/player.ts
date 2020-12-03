@@ -55,13 +55,17 @@ export const usePlayerTarget = (): number | null => {
         return attackRange[0]
     }
     return null
-    // return targets.length > 0 ? targets[0] : null
 }
 
 export const usePlayerHasTarget = (): boolean => {
     const target = usePlayerTarget()
-    console.log('target', target)
     return target !== null
+}
+
+export const usePlayerInCombat = (): boolean => {
+    const target = usePlayerTarget()
+    const {closeRange} = useProxy(playerTargets)
+    return target !== null || closeRange.length > 0
 }
 
 export const removePlayerFromRange = (mobID: number) => {
@@ -72,12 +76,10 @@ export const removePlayerFromRange = (mobID: number) => {
 }
 
 export const addToPlayerCloseRange = (mobID: number) => {
-    console.log('addToPlayerCloseRange', mobID)
     playerTargets.closeRange.push(mobID)
 }
 
 export const removeFromPlayerCloseRange = (mobID: number) => {
-    console.log('removeFromPlayerCloseRange', mobID)
     const index = playerTargets.closeRange.indexOf(mobID)
     if (index >= 0) {
         playerTargets.closeRange.splice(index, 1)

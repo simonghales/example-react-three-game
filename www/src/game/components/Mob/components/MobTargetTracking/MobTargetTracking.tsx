@@ -7,10 +7,6 @@ const MobTargetTracking: React.FC<{
     localRef: MutableRefObject<Object3D>
 }> = ({localRef}) => {
 
-    useEffect(() => {
-        console.log('being tracked!')
-    }, [])
-
     useFrame(() => {
         playerPosition.targetX = localRef.current.position.x
         playerPosition.targetY = localRef.current.position.z
