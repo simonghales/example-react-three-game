@@ -49,14 +49,12 @@ export const usePlayerAttackHandler = () => {
                     manager.lastHit = Date.now()
                     const [enemyX, enemyY] = getMobPosition(mobID)
 
-                    const angle = Math.atan2(enemyY - playerPosition.y, enemyX - playerPosition.x) * 180 / Math.PI;
+                    const angle = Math.atan2(playerPosition.y - enemyY, playerPosition.x - enemyX)
 
-                    const xVector = Math.cos(angle)
-                    const yVector = Math.sin(angle)
+                    const xVector = Math.cos(angle) * -1
+                    const yVector = Math.sin(angle) * -1
 
                     manager.attackVector = [xVector, yVector]
-                    console.log('angle', angle, xVector, yVector)
-                    // todo - get vector from player to enemy
                 })
             }, 200)
         }
