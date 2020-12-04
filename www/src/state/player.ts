@@ -38,14 +38,24 @@ export const playerHealth = proxy<{
     lastDamaged: number,
 }>({
     maxHealth: 4,
-    health: 2,
+    health: 3.5,
     lastDamaged: 0,
 })
+
+export const playerHasFullHealth = (): boolean => {
+    return playerHealth.health >= playerHealth.maxHealth
+}
 
 export const JUICE_RECHARGE_COST = 50
 
 export const playerCanRecharge = (): boolean => {
-    return playerJuice.juice >= JUICE_RECHARGE_COST
+    return playerJuice.juice >= JUICE_RECHARGE_COST && !playerHasFullHealth()
+}
+
+export const usePlayerCanRecharge = (): boolean => {
+    const {juice} = useProxy(playerJuice)
+    const {health, maxHealth} = useProxy(playerHealth)
+    return juice >= JUICE_RECHARGE_COST && health < maxHealth
 }
 
 export const rechargePlayer = () => {

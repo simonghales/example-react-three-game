@@ -1,8 +1,9 @@
 import React, {useCallback} from "react";
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import {GiPrayer, GiPunch, GiRun} from "react-icons/all";
 import {InputKeys, inputsState, RAW_INPUTS} from "../../../../../state/inputs";
 import StatsUI from "./components/StatsUI/StatsUI";
+import {usePlayerCanRecharge} from "../../../../../state/player";
 
 const StyledWrapper = styled.div`
     user-select: none;
@@ -17,7 +18,13 @@ const StyledContainer = styled.div`
     align-items: flex-end;
 `;
 
-const StyledAttackButton = styled.div`
+const cssDisabled = css`
+  opacity: 0.25;
+`
+
+const StyledAttackButton = styled.div<{
+    disabled?: boolean,
+}>`
     width: 100px;
     height: 100px;
     border: 2px solid white;
@@ -31,6 +38,8 @@ const StyledAttackButton = styled.div`
       margin-left: 10px;
     }
     
+    ${props => props.disabled ? cssDisabled : ''};
+    
 `;
 
 const StyledButtons = styled.div`
@@ -39,6 +48,8 @@ const StyledButtons = styled.div`
 `;
 
 const GameUI: React.FC = () => {
+
+    const canRecharge = usePlayerCanRecharge()
 
     const onPunchMouseDown = useCallback(() => {
         inputsState[InputKeys.PUNCH].raw = true
@@ -74,7 +85,7 @@ const GameUI: React.FC = () => {
                 </StyledAttackButton>
                 <StyledButtons>
                     <StyledAttackButton onMouseDown={onRechargeMouseDown} onMouseUp={onRechargeMouseUp}
-                                        onTouchStart={onRechargeMouseDown} onTouchEnd={onRechargeMouseUp}>
+                                        onTouchStart={onRechargeMouseDown} onTouchEnd={onRechargeMouseUp} disabled={!canRecharge}>
                         <GiPrayer size={60}/>
                     </StyledAttackButton>
                     <StyledAttackButton onMouseDown={onRunMouseDown} onMouseUp={onRunMouseUp}

@@ -53,7 +53,7 @@ const endRechargeProcess = () => {
 const rechargeCoroutine = function* () {
     const start = Date.now()
     const wait = start + 500
-    const completion = wait + 250
+    const completion = wait + 500
     beginPreRechargeProcess()
     let rechargePressed = true
     while (Date.now() < wait) {
