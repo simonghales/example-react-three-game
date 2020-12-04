@@ -22,25 +22,25 @@ const useAllowedMovementOffset = (): [number, number] => {
     return portrait ? [1.5, 3] : [3.5, 2.5]
 }
 
-const useCameraOffset = (): [number, number] => {
+const useCameraOffset = (): [y: number, z: number, x: number,] => {
     const portrait = useIsPortrait()
-    return portrait ? [90, 90] : [75, 75]
+    return portrait ? [100, 100, 100] : [75, 75, 75]
 }
 
 const useCameraShadowBounds = (portrait: boolean): [left: number, right: number, top: number, bottom: number] => {
     if (portrait) {
         return [
-            10,
-            70,
-            65,
-            0
+            75,
+            130,
+            -10,
+            50
         ]
     }
     return [
-        25,
-        75,
-        45,
-        0
+        0,
+        100,
+        -10,
+        50
     ]
 }
 
@@ -51,7 +51,7 @@ const Camera: React.FC = () => {
     const targetLocked = usePlayerHasTarget()
     const inDanger = useEnemiesInRange()
     const [allowedX, allowedY] = useAllowedMovementOffset()
-    const [cameraYOffset, cameraZOffset] = useCameraOffset()
+    const [cameraYOffset, cameraZOffset, cameraXOffset] = useCameraOffset()
     const portrait = useIsPortrait()
     const [shadowLeft, shadowRight, shadowTop, shadowBottom] = useCameraShadowBounds(portrait)
 
@@ -92,7 +92,7 @@ const Camera: React.FC = () => {
 
         const moving = playerYDiff !== 0 || playerXDiff !== 0
 
-        const cameraXDiff = x - playerPosition.x
+        const cameraXDiff = (x - playerPosition.x) + cameraXOffset
         const cameraYDiff = (y - playerPosition.y) + cameraZOffset
 
         let movedSufficiently = inDanger || !data.atRest || (Math.abs(cameraXDiff) > allowedX || Math.abs(cameraYDiff) > allowedY) || (Math.abs(playerXDiff) > 500 || Math.abs(playerYDiff) > 500)
@@ -109,13 +109,13 @@ const Camera: React.FC = () => {
             data.previousXDiff = adjustedXDiff
             data.previousYDiff = adjustedYDiff
 
-            newX = playerPosition.x + (adjustedXDiff * 0.01)
+            newX = playerPosition.x + (adjustedXDiff * 0.01) - cameraXOffset
             newY = playerPosition.y + (adjustedYDiff * 0.01) - cameraZOffset
         }
 
         if (isTargetLocked) {
 
-            newX = numLerp(newX, playerPosition.targetX, 0.33)
+            newX = numLerp(newX, playerPosition.targetX - cameraXOffset, 0.33)
             newY = numLerp(newY, playerPosition.targetY - cameraZOffset, 0.33)
 
         }
@@ -152,19 +152,19 @@ const Camera: React.FC = () => {
     })
 
     return (
-        <perspectiveCamera ref={ref} fov={10} position={[0, cameraYOffset, -cameraZOffset]} near={75} far={150}>
+        <perspectiveCamera ref={ref} fov={10} position={[-cameraXOffset, cameraYOffset, -cameraZOffset]} near={100} far={250}>
             <directionalLight
                 ref={lightRef}
                 intensity={0.4}
-                position={[50, cameraYOffset + 1, cameraZOffset + 100]}
+                position={[cameraXOffset, cameraYOffset + 1, cameraZOffset + 100]}
                 shadow-mapSize-width={2048}
                 shadow-mapSize-height={2048}
                 shadowCameraLeft={shadowLeft}
                 shadowCameraRight={shadowRight}
                 shadowCameraTop={shadowTop}
                 shadowCameraBottom={shadowBottom}
-                shadowCameraNear={250}
-                shadowCameraFar={400}
+                shadowCameraNear={300}
+                shadowCameraFar={450}
                 castShadow
             />
             {/*{light.current && <directionalLightHelper args={[light.current, 5]}/>}*/}

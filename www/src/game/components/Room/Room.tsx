@@ -5,6 +5,7 @@ import {useBody} from "../../../physics/components/Physics/hooks";
 import {BodyShape, BodyType} from "../../../physics/bodies";
 import {Vec2} from "planck-js";
 import {COLLISION_FILTER_GROUPS} from "../../../physics/collisions/filters";
+import {radians} from "../../../utils/angles";
 
 const Room: React.FC = () => {
 

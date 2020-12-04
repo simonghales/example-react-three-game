@@ -1,7 +1,7 @@
 import React, {Suspense, useCallback, useEffect, useRef} from "react";
 import {nippleManager} from "../Joystick/Joystick";
 import {useFrame} from "react-three-fiber";
-import {radians} from "../../../utils/angles";
+import {radians, rotateVector} from "../../../utils/angles";
 import {gameRefs} from "../../../state/refs";
 import {playerPosition} from "../../../state/positions";
 import {usePlayerControls} from "./hooks/controls";
@@ -160,6 +160,11 @@ const Player: React.FC = () => {
             }
 
         }
+
+        const [adjustedXVel, adjustedYVel] = rotateVector(xVel, yVel, -45)
+
+        xVel = adjustedXVel
+        yVel = adjustedYVel
 
         const isMoving = xVel !== 0 || yVel !== 0
         const isRunning = inputsState[InputKeys.SHIFT].active && !inCombat && energy > 0
