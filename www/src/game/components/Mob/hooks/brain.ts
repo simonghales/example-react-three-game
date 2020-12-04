@@ -6,9 +6,10 @@ import {playerPosition} from "../../../../state/positions";
 import {Vec2} from "planck-js";
 import {useProxy} from "valtio";
 import {getMobHealthManager} from "../../../../state/mobs";
-import {dealPlayerDamage, playerHealth, playerState, playerTargets} from "../../../../state/player";
+import {dealPlayerDamage, playerState, playerTargets} from "../../../../state/player";
 import {coroutine} from "../../Player/Player";
 import {DIAGONAL} from "../../../../utils/common";
+import {MOB_VARIANT} from "../data";
 
 const attackPlayerCoroutine = function* () {
 
@@ -39,7 +40,7 @@ const attackPlayerCoroutine = function* () {
 const velocity = Vec2(0, 0)
 const position = Vec2(0, 0)
 
-export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
+export const useMobBrain = (id: number, api: BodyApi, ref: any, variant: MOB_VARIANT) => {
     const [localState] = useState(() => ({
         attackInitiated: false,
         attackPending: false,
@@ -143,6 +144,11 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
                     if (xVel !== 0 && yVel !== 0) {
                         xVel = xVel * DIAGONAL
                         yVel = yVel * DIAGONAL
+                    }
+
+                    if (variant === MOB_VARIANT.large) {
+                        xVel = xVel * 5
+                        yVel = yVel * 5
                     }
 
                 }

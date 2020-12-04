@@ -20,6 +20,7 @@ import WallCorner from "../../../3d/models/WallCorner/WallCorner";
 import PhysWall from "../PhysWall/PhysWall";
 import Room from "../Room/Room";
 import GameAI from "./components/GameAI/GameAI";
+import MobsManager from "../MobsManager/MobsManager";
 
 
 export const STATS_CSS_CLASS = 'stats'
@@ -59,12 +60,7 @@ const Game: React.FC = () => {
                             <Floor/>
                             <Player/>
                             {/*<OldMob/>*/}
-                            <Mob id={0} x={6} y={10}/>
-                            <Mob id={1} x={12} y={10}/>
-                            <Mob id={2} x={18} y={10}/>
-                            <Mob id={3} x={6} y={13}/>
-                            <Mob id={4} x={12} y={13}/>
-                            <Mob id={5} x={18} y={13}/>
+                            <MobsManager/>
                             <AttackColliders/>
                             <Stats className={STATS_CSS_CLASS}/>
                             <Room/>

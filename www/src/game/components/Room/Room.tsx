@@ -9,7 +9,7 @@ import {radians} from "../../../utils/angles";
 
 const Room: React.FC = () => {
 
-    const [x, y] = [-4, -3]
+    const [x, y] = [5, 5]
 
     const walls = roomWalls
 

@@ -8,6 +8,7 @@ import {usePlayerTarget} from "../../../state/player";
 import {deleteMobHealthManager, getMobHealthManager, initMobHealthManager} from "../../../state/mobs";
 import {addMob, removeMob, updateMob} from "../../../temp/ai";
 import {useMobBrain} from "./hooks/brain";
+import {MOB_VARIANT} from "./data";
 
 const useIsTargeted = (id: number): boolean => {
     const targetID = usePlayerTarget()
@@ -25,7 +26,8 @@ const MobInner: React.FC<{
     id: number,
     x: number,
     y: number,
-}> = ({id, x, y}) => {
+    variant: MOB_VARIANT,
+}> = ({id, x, y, variant}) => {
 
     const localRef = useRef<Object3D>(new Object3D())
     const isTargeted = useIsTargeted(id)
@@ -44,10 +46,10 @@ const MobInner: React.FC<{
         <>
             {
                 !isDead && (
-                    <MobPhysics x={x} y={y} id={id} localRef={localRef}/>
+                    <MobPhysics variant={variant} x={x} y={y} id={id} localRef={localRef}/>
                 )
             }
-            <MobVisuals lastHit={managerProxy.lastHit} lastAttacked={managerProxy.lastAttacked} x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
+            <MobVisuals variant={variant} lastHit={managerProxy.lastHit} lastAttacked={managerProxy.lastAttacked} x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
             {
                 isTargeted && (
                     <MobTargetTracking localRef={localRef}/>
@@ -61,7 +63,8 @@ const Mob: React.FC<{
     id: number,
     x: number,
     y: number,
-}> = ({id, x, y}) => {
+    variant?: MOB_VARIANT,
+}> = ({id, x, y, variant = MOB_VARIANT.small}) => {
 
     const [mounted, setMounted] = useState(false)
 
@@ -78,7 +81,7 @@ const Mob: React.FC<{
 
     if (!mounted) return null
 
-    return <MobInner id={id} x={x} y={y}/>
+    return <MobInner id={id} x={x} y={y} variant={variant}/>
 }
 
 export default Mob;

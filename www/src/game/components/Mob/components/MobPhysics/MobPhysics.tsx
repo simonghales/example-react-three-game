@@ -1,20 +1,21 @@
-import React, {MutableRefObject, useCallback, useEffect} from "react";
+import React, {MutableRefObject, useCallback} from "react";
 import {Object3D} from "three";
 import {useBody} from "../../../../../physics/components/Physics/hooks";
 import {BodyShape, BodyType} from "../../../../../physics/bodies";
 import {Vec2} from "planck-js";
 import {COLLISION_FILTER_GROUPS} from "../../../../../physics/collisions/filters";
-import {useFrame} from "react-three-fiber";
 import {FixtureType} from "../../../../../physics/collisions/types";
 import {updateMob} from "../../../../../temp/ai";
 import {useMobBrain} from "../../hooks/brain";
+import {MOB_VARIANT} from "../../data";
 
 const MobPhysics: React.FC<{
     x: number,
     y: number,
     id: number,
+    variant: MOB_VARIANT,
     localRef: MutableRefObject<Object3D>,
-}> = ({x, y, id, localRef}) => {
+}> = ({x, y, id, localRef, variant}) => {
 
     const onCollideStart = useCallback(({type}: any) => {
         if (type !== undefined && type === FixtureType.PLAYER_RANGE) {
@@ -40,7 +41,7 @@ const MobPhysics: React.FC<{
         linearDamping: 4,
         fixtures: [{
             shape: BodyShape.circle,
-            radius: size * 0.75,
+            radius: size * (variant === MOB_VARIANT.large ? 2 : 0.75),
             fixtureOptions: {
                 density: 20,
                 isSensor: false,
@@ -59,7 +60,7 @@ const MobPhysics: React.FC<{
     })
 
 
-    useMobBrain(id, api, ref)
+    useMobBrain(id, api, ref, variant)
 
     return null;
 };
