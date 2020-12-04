@@ -40,7 +40,7 @@ const MobPhysics: React.FC<{
         linearDamping: 4,
         fixtures: [{
             shape: BodyShape.circle,
-            radius: size,
+            radius: size * 0.75,
             fixtureOptions: {
                 density: 20,
                 isSensor: false,

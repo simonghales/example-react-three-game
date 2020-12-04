@@ -7,12 +7,23 @@ export const playerEnergy = proxy<{
 })
 
 export const playerHealth = proxy<{
+    maxHealth: number,
     health: number,
     lastDamaged: number,
 }>({
-    health: 100,
+    maxHealth: 4,
+    health: 4,
     lastDamaged: 0,
 })
+
+export const dealPlayerDamage = (damage: number) => {
+    let newPlayerHealth = playerHealth.health - damage
+    if (newPlayerHealth < 0) {
+        newPlayerHealth = 0
+    }
+    playerHealth.health = newPlayerHealth
+    playerHealth.lastDamaged = Date.now()
+}
 
 export const playerTargets = proxy<{
     attackRange: number[],

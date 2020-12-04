@@ -6,7 +6,7 @@ import {playerPosition} from "../../../../state/positions";
 import {Vec2} from "planck-js";
 import {useProxy} from "valtio";
 import {getMobHealthManager} from "../../../../state/mobs";
-import {playerHealth, playerTargets} from "../../../../state/player";
+import {dealPlayerDamage, playerHealth, playerTargets} from "../../../../state/player";
 import {coroutine} from "../../Player/Player";
 
 const attackPlayerCoroutine = function* () {
@@ -23,19 +23,14 @@ const attackPlayerCoroutine = function* () {
     yield true
 
     // wait 100ms
-    while (attackStarted > Date.now() - 100) {
+    while (attackStarted > Date.now() - 250) {
         yield null
     }
 
-    if (attackStarted > Date.now() + 200) {
-        // too old, ignore
+    if (Date.now() > attackStarted + 300) {
+        // outdated, ignore
     } else {
-        let newPlayerHealth = playerHealth.health - 5
-        if (newPlayerHealth < 0) {
-            newPlayerHealth = 0
-        }
-        playerHealth.health = newPlayerHealth
-        playerHealth.lastDamaged = Date.now()
+        dealPlayerDamage(0.5)
     }
 
 }
