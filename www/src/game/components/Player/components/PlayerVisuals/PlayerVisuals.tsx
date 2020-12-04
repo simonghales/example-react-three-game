@@ -2,9 +2,9 @@ import React, {Suspense, useEffect, useState} from "react";
 import Knight from "../../../../../3d/models/Knight/Knight";
 import {proxy, useProxy} from "valtio";
 import {attackState} from "../../hooks/attack";
-import {playerHealth} from "../../../../../state/player";
+import {playerHealth, playerState} from "../../../../../state/player";
 
-export const playerState = proxy({
+export const playerVisualState = proxy({
     rollCooldown: false,
     rolling: false,
     moving: false,
@@ -13,13 +13,14 @@ export const playerState = proxy({
 
 const PlayerVisuals: React.FC = () => {
 
-    const localPlayerState = useProxy(playerState)
+    const {recharging, preRecharging} = useProxy(playerState)
+    const localPlayerState = useProxy(playerVisualState)
     const {lastAttack} = useProxy(attackState)
     const {lastDamaged} = useProxy(playerHealth)
 
     return (
         <Suspense fallback={null}>
-            <Knight lastDamaged={lastDamaged} lastAttack={lastAttack} moving={localPlayerState.moving} running={localPlayerState.running} position={[0, localPlayerState.rolling ? -1.5 : 0, 0]}/>
+            <Knight recharging={recharging || preRecharging} lastDamaged={lastDamaged} lastAttack={lastAttack} moving={localPlayerState.moving} running={localPlayerState.running} position={[0, localPlayerState.rolling ? -1.5 : 0, 0]}/>
         </Suspense>
     );
 };

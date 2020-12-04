@@ -10,11 +10,20 @@ import {lerpRadians, numLerp, PI, PI_TIMES_TWO} from "../../../utils/numbers";
 import {DIAGONAL} from "../../../utils/common";
 import {Vec2} from "planck-js";
 import {usePlayerPhysics} from "./hooks/physics";
-import PlayerVisuals, {playerState} from "./components/PlayerVisuals/PlayerVisuals";
+import PlayerVisuals, {playerVisualState} from "./components/PlayerVisuals/PlayerVisuals";
 import PlayerDebug from "./components/PlayerDebug/PlayerDebug";
-import {playerEnergy, usePlayerHasTarget, usePlayerInCombat} from "../../../state/player";
+import {
+    JUICE_RECHARGE_COST, playerCanRecharge,
+    playerEnergy,
+    playerJuice,
+    playerState,
+    rechargePlayer,
+    usePlayerHasTarget,
+    usePlayerInCombat
+} from "../../../state/player";
 import {usePlayerCollisionsHandler} from "./hooks/collisions";
 import {usePlayerEffectsHandler} from "./hooks/effects";
+import {usePlayerStateHandler} from "./hooks/state";
 
 export const coroutine = (f: any, params = undefined) => {
     const o = f(params); // instantiate the coroutine
@@ -23,22 +32,67 @@ export const coroutine = (f: any, params = undefined) => {
     };
 };
 
+enum RechargeState {
+    PENDING,
+    ACTIVATED
+}
+
+const beginPreRechargeProcess = () => {
+    playerState.preRecharging = true
+}
+
+const beginRechargeProcess = () => {
+    playerState.recharging = true
+}
+
+const endRechargeProcess = () => {
+    playerState.preRecharging = false
+    playerState.recharging = false
+}
+
+const rechargeCoroutine = function* () {
+    const start = Date.now()
+    const wait = start + 500
+    const completion = wait + 250
+    beginPreRechargeProcess()
+    let rechargePressed = true
+    while (Date.now() < wait) {
+        if (!rechargePressed || !playerState.preRecharging) {
+            endRechargeProcess()
+            return
+        }
+        rechargePressed = yield RechargeState.PENDING
+    }
+    beginRechargeProcess()
+    while (Date.now() < completion) {
+        yield RechargeState.ACTIVATED
+    }
+    rechargePlayer()
+    endRechargeProcess()
+}
+
 const rollCooldownCoroutine = function* () {
     let wait = Date.now() + 500;
-    playerState.rollCooldown = true
+    playerVisualState.rollCooldown = true
     while (Date.now() < wait) {
         yield null;
     }
-    playerState.rollCooldown = false
+    playerVisualState.rollCooldown = false
 }
 
 const rollCoroutine = function* () {
     let wait = Date.now() + 500;
-    playerState.rolling = true
+    playerVisualState.rolling = true
     while (Date.now() < wait) {
         yield null;
     }
-    playerState.rolling = false
+    playerVisualState.rolling = false
+}
+
+const rechargeManager: {
+    rechargeCoroutine: any,
+} = {
+    rechargeCoroutine: null,
 }
 
 const rollManager: {
@@ -81,6 +135,7 @@ const Player: React.FC = () => {
     usePlayerCollisionsHandler(api)
     usePlayerControls()
     usePlayerEffectsHandler()
+    usePlayerStateHandler()
     const targetLocked = usePlayerHasTarget()
     const inCombat = usePlayerInCombat()
 
@@ -166,8 +221,33 @@ const Player: React.FC = () => {
         xVel = adjustedXVel
         yVel = adjustedYVel
 
-        const isMoving = xVel !== 0 || yVel !== 0
-        const isRunning = inputsState[InputKeys.SHIFT].active && !inCombat && energy > 0
+        let rechargeAttempt = inputsState[InputKeys.RECHARGE].active && playerCanRecharge()
+        let canMove = !rechargeAttempt
+        let isRechargingActivated = false
+
+        if (rechargeManager.rechargeCoroutine) {
+
+            const rechargeResponse = rechargeManager.rechargeCoroutine(rechargeAttempt)
+
+            if (rechargeResponse.done) {
+                rechargeManager.rechargeCoroutine = null
+            } else if (rechargeResponse.value === RechargeState.ACTIVATED) {
+                isRechargingActivated = true
+            }
+
+        } else if (rechargeAttempt) {
+            rechargeManager.rechargeCoroutine = coroutine(rechargeCoroutine)
+
+        }
+
+        if (isRechargingActivated) {
+            xVel = 0
+            yVel = 0
+            canMove = false
+        }
+
+        const isMoving = canMove && (xVel !== 0 || yVel !== 0)
+        const isRunning = canMove && inputsState[InputKeys.SHIFT].active && !inCombat && energy > 0
 
         if (!!rollManager.cooldownCoroutine) {
             if (rollManager.cooldownCoroutine().done) {
@@ -175,7 +255,7 @@ const Player: React.FC = () => {
             }
         }
 
-        const isRolling = inputsState[InputKeys.SHIFT].active && inCombat && !playerState.rollCooldown && energy >= 33
+        const isRolling = canMove && inputsState[InputKeys.SHIFT].active && inCombat && !playerVisualState.rollCooldown && energy >= 33
         const ongoingRoll = !!rollManager.rollCoroutine
 
         if (ongoingRoll) {
@@ -247,12 +327,12 @@ const Player: React.FC = () => {
 
         }
 
-        if (playerState.moving !== isMoving) {
-            playerState.moving = isMoving
+        if (playerVisualState.moving !== isMoving) {
+            playerVisualState.moving = isMoving
         }
 
-        if (playerState.running !== isRunning) {
-            playerState.running = isRunning
+        if (playerVisualState.running !== isRunning) {
+            playerVisualState.running = isRunning
         }
 
         if (energy < 0) {

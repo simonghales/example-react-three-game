@@ -61,8 +61,9 @@ armorDarkMaterial.color.convertSRGBToLinear();
 type ActionName = 'Idle' | 'PickUp' | 'Punch' | 'RecieveHit' | 'Run' | 'SitDown' | 'Walk'
 type GLTFActions = Record<ActionName, AnimationAction>
 
-export default function Knight({moving, running, lastDamaged, lastAttack, ...props}: JSX.IntrinsicElements['group'] & {
+export default function Knight({moving, recharging, running, lastDamaged, lastAttack, ...props}: JSX.IntrinsicElements['group'] & {
     moving: boolean,
+    recharging: boolean,
     running: boolean,
     lastDamaged: number,
     lastAttack: number,
@@ -100,6 +101,8 @@ export default function Knight({moving, running, lastDamaged, lastAttack, ...pro
     actions.current.RecieveHit.loop = LoopOnce
     actions.current.RecieveHit.clampWhenFinished = true
     actions.current.RecieveHit.timeScale = 1.2
+    actions.current.SitDown.loop = LoopOnce
+    actions.current.SitDown.clampWhenFinished = true
     return () => animations.forEach((clip) => mixer.uncacheClip(clip))
   }, [])
 
@@ -171,6 +174,10 @@ export default function Knight({moving, running, lastDamaged, lastAttack, ...pro
 
                 processAnimation(hitKey, actions.current.RecieveHit)
 
+            } else if (recharging) {
+
+                processAnimation('recharging', actions.current.SitDown)
+
             } else {
 
                 if (moving) {
@@ -195,7 +202,7 @@ export default function Knight({moving, running, lastDamaged, lastAttack, ...pro
             unsubscribe()
         }
 
-    }, [moving, running, lastAttack, lastDamaged])
+    }, [moving, recharging, running, lastAttack, lastDamaged])
 
   return (
     <group ref={group} {...props} dispose={null}>

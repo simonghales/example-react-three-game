@@ -5,12 +5,7 @@ import {playerHealth} from "../../../../../../../../state/player";
 import {GiHearts} from "react-icons/all";
 import {COLORS} from "../../../../../../../../ui/colors";
 
-const StyledContainer = styled.div`
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 9999999;
-`
+const StyledContainer = styled.div``
 
 const StyledHeartsContainer = styled.div`
   display: flex;

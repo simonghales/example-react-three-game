@@ -1,9 +1,35 @@
 import {proxy, useProxy} from "valtio";
 
+export const playerJuice = proxy<{
+    juice: number,
+}>({
+    juice: 100,
+})
+
+export const increasePlayerJuice = (juice: number) => {
+    const currentJuice = playerJuice.juice
+    if (currentJuice >= 100) return
+    let newJuice = currentJuice + juice
+    if (newJuice > 100) {
+        newJuice = 100
+    }
+    playerJuice.juice = newJuice
+}
+
+export const playerState = proxy<{
+    invincible: boolean,
+    preRecharging: boolean,
+    recharging: boolean,
+}>({
+    invincible: false,
+    preRecharging: false,
+    recharging: false,
+})
+
 export const playerEnergy = proxy<{
     energy: number,
 }>({
-    energy: 100,
+    energy: 50,
 })
 
 export const playerHealth = proxy<{
@@ -12,17 +38,48 @@ export const playerHealth = proxy<{
     lastDamaged: number,
 }>({
     maxHealth: 4,
-    health: 4,
+    health: 2,
     lastDamaged: 0,
 })
 
+export const JUICE_RECHARGE_COST = 50
+
+export const playerCanRecharge = (): boolean => {
+    return playerJuice.juice >= JUICE_RECHARGE_COST
+}
+
+export const rechargePlayer = () => {
+    if (playerHealth.health >= playerHealth.maxHealth) {
+        console.warn(`Player health already full.`)
+        return
+    }
+    if (!playerCanRecharge()) {
+        console.warn(`Can't recharge the player, there's no juice.`)
+        return
+    }
+    let newJuice = playerJuice.juice - JUICE_RECHARGE_COST
+    if (newJuice < 0) {
+        newJuice = 0
+    }
+    playerJuice.juice = newJuice
+    let newHealth = playerHealth.health + 1
+    if (newHealth > playerHealth.maxHealth) {
+        newHealth = playerHealth.maxHealth
+    }
+    playerHealth.health = newHealth
+}
+
 export const dealPlayerDamage = (damage: number) => {
+    if (playerState.invincible) {
+        return
+    }
     let newPlayerHealth = playerHealth.health - damage
     if (newPlayerHealth < 0) {
         newPlayerHealth = 0
     }
     playerHealth.health = newPlayerHealth
     playerHealth.lastDamaged = Date.now()
+    playerState.preRecharging = false
 }
 
 export const playerTargets = proxy<{

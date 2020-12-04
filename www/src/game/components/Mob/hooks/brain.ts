@@ -6,15 +6,16 @@ import {playerPosition} from "../../../../state/positions";
 import {Vec2} from "planck-js";
 import {useProxy} from "valtio";
 import {getMobHealthManager} from "../../../../state/mobs";
-import {dealPlayerDamage, playerHealth, playerTargets} from "../../../../state/player";
+import {dealPlayerDamage, playerHealth, playerState, playerTargets} from "../../../../state/player";
 import {coroutine} from "../../Player/Player";
+import {DIAGONAL} from "../../../../utils/common";
 
 const attackPlayerCoroutine = function* () {
 
     const started = Date.now()
 
-    // wait 500ms
-    while (started > Date.now() - 500) {
+    // wait 250ms
+    while (started > Date.now() - 250) {
         yield null
     }
 
@@ -28,7 +29,7 @@ const attackPlayerCoroutine = function* () {
     }
 
     if (Date.now() > attackStarted + 300) {
-        // outdated, ignore
+        console.log('attack is outdated')
     } else {
         dealPlayerDamage(0.5)
     }
@@ -93,7 +94,7 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
 
                 if (Math.abs(xDistance) <= 2 && Math.abs(yDistance) <= 2) {
 
-                    if (manager.lastAttacked < now - 1500 && !localState.attackPending && !localState.attackInitiated) {
+                    if (manager.lastAttacked < now - 1500 && !localState.attackPending && !localState.attackInitiated && !playerState.invincible) {
 
                         localState.attackPending = true
                         coroutineManager.attack = coroutine(attackPlayerCoroutine)
@@ -129,15 +130,21 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any) => {
                     }
 
                     if (x > playerPosition.x) {
-                        xVel = -1.25
+                        xVel = -1
                     } else if (x < playerPosition.x) {
-                        xVel = 1.25
+                        xVel = 1
                     }
                     if (y > playerPosition.y) {
-                        yVel = -1.25
+                        yVel = -1
                     } else if (y < playerPosition.y) {
-                        yVel = 1.25
+                        yVel = 1
                     }
+
+                    if (xVel !== 0 && yVel !== 0) {
+                        xVel = xVel * DIAGONAL
+                        yVel = yVel * DIAGONAL
+                    }
+
                 }
 
             } else if (mobData.goal === MobAIGoal.IDLE) {

@@ -54,7 +54,7 @@ const MobVisuals: React.FC<{
     return (
         <group ref={localRef} position={[x, 0, y]}>
             <Suspense fallback={null}>
-                <Demon isDead={isDead} lastHit={lastHit} lastAttacked={lastAttacked} position={[0, isDead ? 0 : 1, 0]} onClick={onClick} scale={[0.5, 0.5, 0.75]}/>
+                <Demon isDead={isDead} lastHit={lastHit} lastAttacked={lastAttacked} position={[0, isDead ? 0 : 1, 0]} onClick={onClick} scale={[0.75, 0.75, 0.75]}/>
             </Suspense>
             {/*<Cylinder args={[0.75, 0.75]}>*/}
             {/*    <meshBasicMaterial attach="material" color={"purple"} transparent*/}

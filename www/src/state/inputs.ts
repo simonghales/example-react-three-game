@@ -17,7 +17,8 @@ export enum InputKeys {
     UP,
     DOWN,
     SHIFT,
-    PUNCH
+    PUNCH,
+    RECHARGE,
 }
 
 export const inputsState: Record<InputKeys, InputState> = {
@@ -54,6 +55,12 @@ export const inputsState: Record<InputKeys, InputState> = {
     },
     [InputKeys.SHIFT]: {
         keys: [16],
+        active: false,
+        pressed: false,
+        released: false,
+    },
+    [InputKeys.RECHARGE]: {
+        keys: [17],
         active: false,
         pressed: false,
         released: false,

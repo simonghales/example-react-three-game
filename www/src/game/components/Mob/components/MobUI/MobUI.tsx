@@ -1,5 +1,5 @@
 import React from "react";
-import {HTML} from "@react-three/drei";
+import {Html} from "@react-three/drei";
 import styled, {css} from "styled-components";
 import {useProxy} from "valtio";
 import {getMobHealthManager} from "../../../../../state/mobs";
@@ -11,6 +11,7 @@ const cssHide = css`
 const StyledContainer = styled.div<{
     hide: boolean,
 }>`
+    pointer-events: none;
     width: 50px;
     height: 10px;
     background-color: rgba(0,0,0,0.25);
@@ -40,11 +41,11 @@ const MobUI: React.FC<{
     const managerProxy = useProxy(getMobHealthManager(id))
     return (
         <group position={[0, 3.5, 0]}>
-            <HTML center>
-                <StyledContainer hide={managerProxy.health === 0}>
+            <Html center>
+                <StyledContainer hide={managerProxy.health <= 0}>
                     <StyledAmount amount={managerProxy.health}/>
                 </StyledContainer>
-            </HTML>
+            </Html>
         </group>
     );
 };

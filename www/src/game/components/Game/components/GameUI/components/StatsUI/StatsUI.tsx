@@ -3,6 +3,14 @@ import styled from "styled-components";
 import {subscribe, useProxy} from "valtio";
 import {playerEnergy} from "../../../../../../../state/player";
 import Health from "./Health/Health";
+import Juice from "./Juice/Juice";
+
+const StyledTopLeftContainer = styled.div`
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 9999999;
+`
 
 const StyledContainer = styled.div`
     position: absolute;
@@ -58,7 +66,10 @@ const StatsUI: React.FC = () => {
 
     return (
         <>
-            <Health/>
+            <StyledTopLeftContainer>
+                <Health/>
+                <Juice/>
+            </StyledTopLeftContainer>
             <StyledContainer>
                 <StyledBar full={full}>
                     <StyledBarInner ref={barRef}/>
