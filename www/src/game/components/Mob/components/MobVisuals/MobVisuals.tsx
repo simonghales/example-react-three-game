@@ -65,7 +65,7 @@ const MobVisuals: React.FC<{
             {/*    <meshBasicMaterial attach="material" color={"purple"} transparent*/}
             {/*                       opacity={0.25}/>*/}
             {/*</Cylinder>*/}
-            <MobUI id={id}/>
+            <MobUI id={id} variant={variant}/>
             <Cylinder visible={targeted}>
                 <meshBasicMaterial attach="material" color={"black"} transparent
                                    opacity={0.25}/>

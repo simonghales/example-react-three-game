@@ -70,7 +70,7 @@ const Mob: React.FC<{
 
     useEffect(() => {
         addMob(id)
-        initMobHealthManager(id)
+        initMobHealthManager(id, variant)
         setMounted(true)
 
         return () => {

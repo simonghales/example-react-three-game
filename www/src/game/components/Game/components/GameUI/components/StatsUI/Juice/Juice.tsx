@@ -31,7 +31,7 @@ const StyledBarInner = styled.div`
 
 const Juice: React.FC = () => {
     const barRef = useRef<any>()
-    const [full, setFull] = useState(() => playerCanRecharge())
+    const [full, setFull] = useState(() => playerCanRecharge(false))
 
     useEffect(() => {
 
@@ -40,7 +40,7 @@ const Juice: React.FC = () => {
                 const juice = playerJuice.juice
                 const juicePercent = 100 - juice
                 barRef.current.style.transform = `translate(-${juicePercent}%, 0)`
-                setFull(playerCanRecharge())
+                setFull(playerCanRecharge(false))
             }
         }
 

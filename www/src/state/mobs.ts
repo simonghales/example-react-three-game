@@ -2,10 +2,30 @@ import {proxy} from "valtio";
 import {increasePlayerJuice, playerTargets} from "./player";
 import {getMobPosition} from "../temp/ai";
 import {playerPosition} from "./positions";
+import {MOB_VARIANT} from "../game/components/Mob/data";
+
+const getMobVariantHealth = (variant: MOB_VARIANT): {
+    health: number,
+    maxHealth: number,
+} => {
+
+    if (variant === MOB_VARIANT.large) {
+        return {
+            health: 250,
+            maxHealth: 250,
+        }
+    }
+
+    return {
+        health: 100,
+        maxHealth: 100,
+    }
+}
 
 export type MobHealth = {
     stunned: boolean,
     health: number,
+    maxHealth: number,
     lastHit: number,
     lastAttacked: number,
     attackVector: [number, number]
@@ -15,10 +35,14 @@ export const mobsHealthManager: {
     [id: number]: MobHealth,
 } = {}
 
-export const initMobHealthManager = (id: number): MobHealth => {
+export const initMobHealthManager = (id: number, variant: MOB_VARIANT): MobHealth => {
+
+    const {health, maxHealth} = getMobVariantHealth(variant)
+
     const manager = proxy<MobHealth>({
         stunned: false,
-        health: 100,
+        health,
+        maxHealth,
         lastHit: 0,
         lastAttacked: 0,
         attackVector: [0, 0]

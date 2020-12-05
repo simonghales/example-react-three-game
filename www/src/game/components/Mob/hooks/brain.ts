@@ -11,12 +11,12 @@ import {coroutine} from "../../Player/Player";
 import {DIAGONAL} from "../../../../utils/common";
 import {MOB_VARIANT} from "../data";
 
-const attackPlayerCoroutine = function* () {
+const attackPlayerCoroutine = function* (attackWaitDuration: number, attackWaitHitDuration: number) {
 
     const started = Date.now()
 
     // wait 250ms
-    while (started > Date.now() - 250) {
+    while (started > Date.now() - attackWaitDuration) {
         yield null
     }
 
@@ -25,7 +25,7 @@ const attackPlayerCoroutine = function* () {
     yield true
 
     // wait 100ms
-    while (attackStarted > Date.now() - 250) {
+    while (attackStarted > Date.now() - attackWaitHitDuration) {
         yield null
     }
 
@@ -93,12 +93,15 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any, variant: MOB_VAR
                 const xDistance = x - playerPosition.x
                 const yDistance = y - playerPosition.y
 
-                if (Math.abs(xDistance) <= 2 && Math.abs(yDistance) <= 2) {
+                const requiredDistance = variant === MOB_VARIANT.large ? 3 : 2
+
+                if (Math.abs(xDistance) <= requiredDistance && Math.abs(yDistance) <= requiredDistance) {
 
                     if (manager.lastAttacked < now - 1500 && !localState.attackPending && !localState.attackInitiated && !playerState.invincible) {
 
                         localState.attackPending = true
-                        coroutineManager.attack = coroutine(attackPlayerCoroutine)
+                        const waitDuration = variant === MOB_VARIANT.large ? 500 : 250
+                        coroutineManager.attack = coroutine(attackPlayerCoroutine, [waitDuration, 250])
 
                     }
 

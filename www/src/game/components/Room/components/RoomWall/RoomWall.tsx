@@ -11,7 +11,7 @@ const IndividualWall: React.FC<{
 }> = ({position, index, vertical}) => {
     return (
         <group position={[position, index / 10000, index / 10000]}>
-            <Box position={[(4 / 2), 0, 0]} args={[4, 7.75, 1]} castShadow>
+            <Box position={[(4 / 2), 0, 0]} args={[4 - 1 / 10000, 7.75, 1]} castShadow>
                 <meshBasicMaterial depthWrite={false} colorWrite={false} />
             </Box>
             <Suspense fallback={null}>

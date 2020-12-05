@@ -38,12 +38,12 @@ const MobPhysics: React.FC<{
     const [ref, api] = useBody(() => ({
         type: BodyType.dynamic,
         position: Vec2(x, y),
-        linearDamping: 4,
+        linearDamping: variant === MOB_VARIANT.large ? 10 : 4,
         fixtures: [{
             shape: BodyShape.circle,
             radius: size * (variant === MOB_VARIANT.large ? 2 : 0.75),
             fixtureOptions: {
-                density: 20,
+                density: variant === MOB_VARIANT.large ? 50 : 40,
                 isSensor: false,
                 filterCategoryBits: COLLISION_FILTER_GROUPS.mob | COLLISION_FILTER_GROUPS.attackReceiver | COLLISION_FILTER_GROUPS.physical,
                 userData: {

@@ -25,8 +25,8 @@ import {usePlayerCollisionsHandler} from "./hooks/collisions";
 import {usePlayerEffectsHandler} from "./hooks/effects";
 import {usePlayerStateHandler} from "./hooks/state";
 
-export const coroutine = (f: any, params = undefined) => {
-    const o = f(params); // instantiate the coroutine
+export const coroutine = (f: any, params: any[] = []) => {
+    const o = f(...params); // instantiate the coroutine
     return function (x: any) {
         return o.next(x);
     };

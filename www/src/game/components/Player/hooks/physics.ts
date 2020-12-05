@@ -58,10 +58,12 @@ export const usePlayerPhysics = () => {
     const [ref, api] = useBody(() => ({
         type: BodyType.dynamic,
         position: Vec2(0, 0),
+        linearDamping: 4,
         fixtures: [{
             shape: BodyShape.circle,
             radius: 0.75,
             fixtureOptions: {
+                density: 20,
                 filterCategoryBits: COLLISION_FILTER_GROUPS.player | COLLISION_FILTER_GROUPS.physical,
             }
         }],
