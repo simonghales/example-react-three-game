@@ -1,14 +1,15 @@
 import {WorkerOwnerMessageType} from "./types";
-import {dynamicBodiesUuids} from "../../shared";
+import {dynamicBodiesUuids, updateBodiesLastUpdated} from "../../shared";
 
 /* eslint-disable-next-line no-restricted-globals */
 const selfWorker = self as unknown as Worker
 
 export const syncBodies = () => {
-    selfWorker.postMessage(({
+    updateBodiesLastUpdated()
+    /*selfWorker.postMessage(({
         type: WorkerOwnerMessageType.SYNC_BODIES,
         bodies: dynamicBodiesUuids
-    }))
+    }))*/
 }
 
 export const sendCollisionBeginEvent = (uuid: string, data: any, fixtureIndex: number) => {

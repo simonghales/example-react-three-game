@@ -27,6 +27,17 @@ const Physics: React.FC = ({children}) => {
 
             switch (type) {
                 case WorkerOwnerMessageType.FRAME:
+
+                    if (event.data.bodies) {
+                        storedPhysicsData.bodies = event.data.bodies.reduce(
+                            (acc: { [key: string]: number }, id: string) => ({
+                                ...acc,
+                                [id]: (event.data as any).bodies.indexOf(id)
+                            }),
+                            {}
+                        )
+                    }
+
                     const positions = event.data.positions as Float32Array
                     const angles = event.data.angles as Float32Array
                     buffers.positions = positions

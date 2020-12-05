@@ -4,6 +4,7 @@ import {WorkerMessageType, WorkerOwnerMessageType} from "./types";
 import {initPhysicsListeners, stepWorld} from "../../physics/world";
 import {syncBodies} from "./functions";
 import {addBody, removeBody, setBody, updateBody} from "../../physics/bodies";
+import {dynamicBodiesUuids, unsyncedBodies} from "../../shared";
 
 const selfWorker = self as unknown as Worker
 
@@ -18,11 +19,17 @@ const step = (positions: Float32Array, angles: Float32Array) => {
 
     stepWorld(positions, angles)
 
-    selfWorker.postMessage({
+    const data: any = {
         type: WorkerOwnerMessageType.FRAME,
         positions,
         angles,
-    }, [positions.buffer, angles.buffer])
+    }
+
+    if (unsyncedBodies) {
+        data['bodies'] = dynamicBodiesUuids
+    }
+
+    selfWorker.postMessage(data, [positions.buffer, angles.buffer])
 
 }
 

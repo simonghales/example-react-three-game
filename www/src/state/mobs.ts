@@ -44,7 +44,13 @@ export const dealDamageToMob = (mobID: number, lockOn: boolean) => {
     if (lockOn) {
         playerTargets.lastAttacked = mobID
     }
-    manager.health = manager.health - 34
+    //let newHealth = manager.health - 34
+    let newHealth = manager.health - 34
+    if (newHealth < 0) {
+        newHealth = 0
+    }
+    manager.health = newHealth
+    //manager.health = manager.health - 1
     manager.lastHit = Date.now()
     const [enemyX, enemyY] = getMobPosition(mobID)
 
