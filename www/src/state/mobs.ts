@@ -65,9 +65,9 @@ export const dealDamageToMob = (mobID: number, lockOn: boolean) => {
     const manager = getMobHealthManager(mobID)
     if (!manager) return
     if (manager.stunned) return
-    if (lockOn) {
-        playerTargets.lastAttacked = mobID
-    }
+    // if (lockOn) {
+    //     playerTargets.lastAttacked = mobID
+    // }
     //let newHealth = manager.health - 34
     let newHealth = manager.health - 34
     if (newHealth < 0) {

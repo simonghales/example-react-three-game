@@ -127,13 +127,17 @@ export const useEnemiesInRange = (): boolean => {
 
 export const usePlayerTarget = (): number | null => {
     const {inRange, lastAttacked, attackRange, lastHitBy} = useProxy(playerTargets)
+
     if (lastAttacked !== null && inRange.includes(lastAttacked)) {
         return lastAttacked
     }
-    if (lastHitBy !== null && inRange.includes(lastHitBy)) {
-        return lastHitBy
-    }
+
     if (attackRange.length > 0) {
+
+        if (lastHitBy !== null && attackRange.includes(lastHitBy)) {
+            return lastHitBy
+        }
+
         return attackRange[0]
     }
     return null

@@ -11,7 +11,7 @@ import {coroutine} from "../../Player/Player";
 import {DIAGONAL} from "../../../../utils/common";
 import {MOB_VARIANT} from "../data";
 
-const attackPlayerCoroutine = function* (attackWaitDuration: number, attackWaitHitDuration: number) {
+const attackPlayerCoroutine = function* (attackWaitDuration: number, attackWaitHitDuration: number, damage: number) {
 
     const started = Date.now()
 
@@ -32,7 +32,7 @@ const attackPlayerCoroutine = function* (attackWaitDuration: number, attackWaitH
     if (Date.now() > attackStarted + 300) {
         console.log('attack is outdated')
     } else {
-        dealPlayerDamage(0.5)
+        dealPlayerDamage(damage)
     }
 
 }
@@ -101,7 +101,8 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any, variant: MOB_VAR
 
                         localState.attackPending = true
                         const waitDuration = variant === MOB_VARIANT.large ? 500 : 250
-                        coroutineManager.attack = coroutine(attackPlayerCoroutine, [waitDuration, 250])
+                        const damage = variant === MOB_VARIANT.large ? 2 : 0.5
+                        coroutineManager.attack = coroutine(attackPlayerCoroutine, [waitDuration, 250, damage])
 
                     }
 
@@ -150,8 +151,8 @@ export const useMobBrain = (id: number, api: BodyApi, ref: any, variant: MOB_VAR
                     }
 
                     if (variant === MOB_VARIANT.large) {
-                        xVel = xVel * 5
-                        yVel = yVel * 5
+                        xVel = xVel * 20
+                        yVel = yVel * 20
                     }
 
                 }
