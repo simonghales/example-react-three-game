@@ -29,7 +29,7 @@ export const playerState = proxy<{
 export const playerEnergy = proxy<{
     energy: number,
 }>({
-    energy: 50,
+    energy: 100,
 })
 
 export const playerHealth = proxy<{

@@ -291,7 +291,9 @@ const Player: React.FC = () => {
 
             } else if (isRunning) {
 
-                energy -= delta * 15
+                const energyUsed = delta * 15
+
+                energy -= energyUsed
 
             }
 
