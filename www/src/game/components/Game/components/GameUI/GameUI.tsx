@@ -88,10 +88,10 @@ const GameUI: React.FC = () => {
                                         onTouchStart={onRechargeMouseDown} onTouchEnd={onRechargeMouseUp} disabled={!canRecharge}>
                         <GiPrayer size={60}/>
                     </StyledAttackButton>
-                    <StyledAttackButton onMouseDown={onRunMouseDown} onMouseUp={onRunMouseUp}
-                                        onTouchStart={onRunMouseDown} onTouchEnd={onRunMouseUp}>
-                        <GiRun size={60}/>
-                    </StyledAttackButton>
+                    {/*<StyledAttackButton onMouseDown={onRunMouseDown} onMouseUp={onRunMouseUp}*/}
+                    {/*                    onTouchStart={onRunMouseDown} onTouchEnd={onRunMouseUp}>*/}
+                    {/*    <GiRun size={60}/>*/}
+                    {/*</StyledAttackButton>*/}
                 </StyledButtons>
             </StyledContainer>
         </StyledWrapper>

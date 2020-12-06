@@ -53,7 +53,7 @@ const Game: React.FC = () => {
         <FullScreen handle={handle}>
             <StyledContainer>
                 <Joystick>
-                    <Canvas onPointerMissed={() => console.log('missed?')} concurrent shadowMap>
+                    <Canvas concurrent shadowMap>
                         <GameAI/>
                         <Physics>
                             <Camera/>

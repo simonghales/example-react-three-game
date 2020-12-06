@@ -1,5 +1,5 @@
 import React, {Suspense, useCallback, useEffect, useRef} from "react";
-import {nippleManager} from "../Joystick/Joystick";
+import {inputData, nippleManager} from "../Joystick/Joystick";
 import {useFrame} from "react-three-fiber";
 import {radians, rotateVector} from "../../../utils/angles";
 import {gameRefs} from "../../../state/refs";
@@ -150,6 +150,9 @@ const Player: React.FC = () => {
         nippleManager?.on("start", () => {
             console.log('normal start...')
             nippleState.active = true
+            if (inputData.lastTouchStart > Date.now() - 450) {
+                inputsState[InputKeys.SHIFT].raw = true
+            }
         })
 
         nippleManager?.on("end", () => {
@@ -158,6 +161,7 @@ const Player: React.FC = () => {
             playerJoystickVelocity.previousY = 0
             playerJoystickVelocity.x = 0
             playerJoystickVelocity.y = 0
+            inputsState[InputKeys.SHIFT].raw = false
         })
 
         nippleManager?.on("move", (_, data) => {
@@ -219,14 +223,19 @@ const Player: React.FC = () => {
 
         }
 
+        let rechargeAttempt = inputsState[InputKeys.RECHARGE].active && playerCanRecharge()
+        let canMove = !rechargeAttempt
+        const isRolling = canMove && inputsState[InputKeys.SHIFT].active && inCombat && !playerVisualState.rollCooldown && energy >= 33
+        let isRechargingActivated = false
+
+        if (isRolling) {
+            // todo - maximise velocity
+        }
+
         const [adjustedXVel, adjustedYVel] = rotateVector(xVel, yVel, -45)
 
         xVel = adjustedXVel
         yVel = adjustedYVel
-
-        let rechargeAttempt = inputsState[InputKeys.RECHARGE].active && playerCanRecharge()
-        let canMove = !rechargeAttempt
-        let isRechargingActivated = false
 
         if (rechargeManager.rechargeCoroutine) {
 
@@ -258,7 +267,6 @@ const Player: React.FC = () => {
             }
         }
 
-        const isRolling = canMove && inputsState[InputKeys.SHIFT].active && inCombat && !playerVisualState.rollCooldown && energy >= 33
         const ongoingRoll = !!rollManager.rollCoroutine
 
         if (ongoingRoll) {
@@ -268,8 +276,14 @@ const Player: React.FC = () => {
             const adjustedXVel = xVel * speed
             const adjustedYVel = yVel * speed
 
-            xVel = numLerp(playerLocalState.xVelocity, adjustedXVel, 0.1)
-            yVel = numLerp(playerLocalState.yVelocity, adjustedYVel, 0.1)
+            if (nippleState.active) {
+                xVel = numLerp(playerLocalState.xVelocity, adjustedXVel, 0.1)
+                yVel = numLerp(playerLocalState.yVelocity, adjustedYVel, 0.1)
+            } else {
+                xVel = playerLocalState.xVelocity
+                yVel = playerLocalState.yVelocity
+            }
+
 
             const response = rollManager.rollCoroutine()
 

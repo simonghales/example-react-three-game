@@ -17,6 +17,11 @@ const StyledContainer = styled.div`
 
 export let nippleManager: JoystickManager;
 
+export const inputData = {
+    lastTouchStart: 0,
+    lastTouchEnd: 0,
+}
+
 const Joystick: React.FC = ({children}) => {
 
     const ref = useRef<any>()
@@ -30,7 +35,7 @@ const Joystick: React.FC = ({children}) => {
     }, [])
 
     return (
-        <StyledContainer ref={ref} onMouseDown={() => console.log('mouse down')}>
+        <StyledContainer ref={ref} onTouchStart={() => inputData.lastTouchStart = Date.now()} onTouchEnd={() => inputData.lastTouchEnd = Date.now()}>
             {children}
         </StyledContainer>
     );

@@ -38,12 +38,10 @@ const AttackUI: React.FC = () => {
         });
 
         manager.on("start", () => {
-            console.log('attack nipple start')
             attackStateProxy.attackEngaged = true
         })
 
         manager.on("end", () => {
-            console.log('attack nipple end')
             attackBuffer.push(Date.now())
             attackInputData.lastReleased = Date.now()
             attackStateProxy.attackEngaged = false
