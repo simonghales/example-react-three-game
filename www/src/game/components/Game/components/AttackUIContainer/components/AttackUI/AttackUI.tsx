@@ -21,6 +21,8 @@ export const attackInputData = {
 
 export const attackBuffer: number[] = []
 
+// todo ! bug when container parent changes size, i think
+
 const AttackUI: React.FC = () => {
 
     const ref = useRef<any>()
@@ -29,7 +31,7 @@ const AttackUI: React.FC = () => {
 
         const manager = nipplejs.create({
             zone: ref.current,
-            dataOnly: true,
+            // dataOnly: true,
             mode: 'static',
             position: {
                 top: '50%',
