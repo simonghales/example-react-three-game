@@ -24,6 +24,8 @@ import {
 import {usePlayerCollisionsHandler} from "./hooks/collisions";
 import {usePlayerEffectsHandler} from "./hooks/effects";
 import {usePlayerStateHandler} from "./hooks/state";
+import PlayerUI from "./components/PlayerUI/PlayerUI";
+import {attackInputData, attackStateProxy} from "../Game/components/AttackUIContainer/components/AttackUI/AttackUI";
 
 export const coroutine = (f: any, params: any[] = []) => {
     const o = f(...params); // instantiate the coroutine
@@ -146,6 +148,7 @@ const Player: React.FC = () => {
     useEffect(() => {
 
         nippleManager?.on("start", () => {
+            console.log('normal start...')
             nippleState.active = true
         })
 
@@ -309,13 +312,34 @@ const Player: React.FC = () => {
 
         const isTargetLocked = targetLocked
 
-        if (isTargetLocked && !ongoingRoll) {
+        const attackInputActive = attackStateProxy.attackEngaged
+
+        const applyAttackAngle = () => {
+            const [attackXVel, attackYVel] = rotateVector(attackInputData.xVel, attackInputData.yVel, -45)
+            const angle = Math.atan2(-attackYVel, attackXVel) - radians(270)
+            playerJoystickVelocity.targetAngle = angle
+
+            if (prevAngle !== angle) {
+                ref.current.rotation.y = lerpRadians(prevAngle, angle, 10 * delta)
+            }
+        }
+
+        if (!ongoingRoll && (attackInputActive)) {
+
+            applyAttackAngle()
+
+        } else if (isTargetLocked && !ongoingRoll) {
 
             const targetX = playerPosition.targetX
             const targetY = playerPosition.targetY
             const angle = Math.atan2((targetX - x), (targetY - y))
             ref.current.rotation.y = lerpRadians(prevAngle, angle, 10 * delta)
             playerJoystickVelocity.targetAngle = angle
+
+        } else if (!ongoingRoll && (attackInputData.lastReleased > Date.now() - 1000)) {
+
+            applyAttackAngle()
+
         } else {
 
             if (isMoving) {
@@ -359,6 +383,7 @@ const Player: React.FC = () => {
         <>
             <group position={[0, 0, 0]} ref={ref}>
                 <PlayerVisuals/>
+                <PlayerUI/>
             </group>
             <PlayerDebug largeColliderRef={largeColliderRef}/>
         </>

@@ -125,6 +125,11 @@ export const useEnemiesInRange = (): boolean => {
     return targets.length > 0
 }
 
+export const useEnemiesInCloseRange = (): boolean => {
+    const {closeRange} = useProxy(playerTargets)
+    return closeRange.length > 0
+}
+
 export const usePlayerTarget = (): number | null => {
     const {inRange, lastAttacked, attackRange, lastHitBy} = useProxy(playerTargets)
 

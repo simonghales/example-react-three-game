@@ -21,6 +21,7 @@ import PhysWall from "../PhysWall/PhysWall";
 import Room from "../Room/Room";
 import GameAI from "./components/GameAI/GameAI";
 import MobsManager from "../MobsManager/MobsManager";
+import AttackUIContainer from "./components/AttackUIContainer/AttackUIContainer";
 
 
 export const STATS_CSS_CLASS = 'stats'
@@ -70,6 +71,7 @@ const Game: React.FC = () => {
                     </Canvas>
                 </Joystick>
                 <GameUI/>
+                <AttackUIContainer/>
                 <DevMenu onFullscreen={enter}/>
             </StyledContainer>
         </FullScreen>

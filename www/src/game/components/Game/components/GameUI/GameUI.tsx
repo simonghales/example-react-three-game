@@ -79,10 +79,10 @@ const GameUI: React.FC = () => {
         <StyledWrapper>
             <StatsUI/>
             <StyledContainer>
-                <StyledAttackButton onMouseDown={onPunchMouseDown} onMouseUp={onPunchMouseUp}
-                                    onTouchStart={onPunchMouseDown} onTouchEnd={onPunchMouseUp}>
-                    <GiPunch size={60}/>
-                </StyledAttackButton>
+                {/*<StyledAttackButton onMouseDown={onPunchMouseDown} onMouseUp={onPunchMouseUp}*/}
+                {/*                    onTouchStart={onPunchMouseDown} onTouchEnd={onPunchMouseUp}>*/}
+                {/*    <GiPunch size={60}/>*/}
+                {/*</StyledAttackButton>*/}
                 <StyledButtons>
                     <StyledAttackButton onMouseDown={onRechargeMouseDown} onMouseUp={onRechargeMouseUp}
                                         onTouchStart={onRechargeMouseDown} onTouchEnd={onRechargeMouseUp} disabled={!canRecharge}>

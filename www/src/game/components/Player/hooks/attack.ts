@@ -6,6 +6,7 @@ import {playerVisualState} from "../components/PlayerVisuals/PlayerVisuals";
 import {playerTargets} from "../../../../state/player";
 import {dealDamageToMob, getMobHealthManager} from "../../../../state/mobs";
 import {getMobPosition} from "../../../../temp/ai";
+import {attackBuffer} from "../../Game/components/AttackUIContainer/components/AttackUI/AttackUI";
 
 let attackCount = 0
 
@@ -28,21 +29,29 @@ export const attackColliders = proxy<{
     colliders: [],
 })
 
+const handleAttack = () => {
+
+    const canAttack = !playerVisualState.rolling
+
+    if (!canAttack) return
+
+    attackState.lastAttack = Date.now()
+    setTimeout(() => {
+        playerTargets.attackRange.forEach((mobID, index) => {
+            dealDamageToMob(mobID, index === 0)
+        })
+    }, 200)
+
+}
+
 export const usePlayerAttackHandler = () => {
 
     useFrame(() => {
-        if (inputsState[InputKeys.PUNCH].released) {
-
-            const canAttack = !playerVisualState.rolling
-
-            if (!canAttack) return
-
-            attackState.lastAttack = Date.now()
-            setTimeout(() => {
-                playerTargets.attackRange.forEach((mobID, index) => {
-                    dealDamageToMob(mobID, index === 0)
-                })
-            }, 200)
+        if (attackBuffer.length > 0) {
+            handleAttack()
+            attackBuffer.length = 0
+        } else if (inputsState[InputKeys.PUNCH].released) {
+            handleAttack()
         }
     }, )
 
