@@ -151,6 +151,8 @@ const AttackUI: React.FC<{
 
         if (event.type === "mousemove") {
 
+            if (!attackStateProxy.attackEngaged) return
+
             x = event.clientX
             y = event.clientY
 
@@ -166,7 +168,7 @@ const AttackUI: React.FC<{
     }, [size])
 
     return (
-        <StyledContainer containerSize={containerSize} ref={ref} onTouchStartCapture={onStart} onTouchEndCapture={onEnd} onTouchMoveCapture={onMove} onMouseDown={onStart} onMouseMoveCapture={onMove} onMouseUp={onEnd}>
+        <StyledContainer containerSize={containerSize} ref={ref} onTouchStartCapture={onStart} onTouchEndCapture={onEnd} onTouchMoveCapture={onMove} onMouseDownCapture={onStart} onMouseMoveCapture={onMove} onMouseUpCapture={onEnd}>
             <StyledInner/>
         </StyledContainer>
     );
