@@ -13,9 +13,9 @@ export enum AttackContainerSize {
 const getAttackContainerSize = (size: AttackContainerSize): number => {
     switch (size) {
         case AttackContainerSize.LARGE:
-            return 200
+            return 180
         case AttackContainerSize.MEDIUM:
-            return 150
+            return 130
         default:
             return 100
     }
