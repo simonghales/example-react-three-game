@@ -98,9 +98,11 @@ const rechargeManager: {
 }
 
 const rollManager: {
+    lastRolled: number,
     rollCoroutine: any,
     cooldownCoroutine: any,
 } = {
+    lastRolled: 0,
     rollCoroutine: null,
     cooldownCoroutine: null,
 }
@@ -112,6 +114,8 @@ const nippleState = {
 const playerLocalState = {
     xVelocity: 0,
     yVelocity: 0,
+    rollXVelocity: 0,
+    rollYVelocity: 0,
 }
 
 const playerJoystickVelocity = {
@@ -150,6 +154,7 @@ const Player: React.FC = () => {
         nippleManager?.on("start", () => {
             nippleState.active = true
             if (inputData.lastTouchStart > Date.now() - 450) {
+                inputsState[InputKeys.SHIFT].rawLastPressed = Date.now()
                 inputsState[InputKeys.SHIFT].raw = true
             }
         })
@@ -224,12 +229,7 @@ const Player: React.FC = () => {
 
         let rechargeAttempt = inputsState[InputKeys.RECHARGE].active && playerCanRecharge()
         let canMove = !rechargeAttempt
-        const isRolling = canMove && inputsState[InputKeys.SHIFT].active && inCombat && !playerVisualState.rollCooldown && energy >= 33
         let isRechargingActivated = false
-
-        if (isRolling) {
-            // todo - maximise velocity
-        }
 
         const [adjustedXVel, adjustedYVel] = rotateVector(xVel, yVel, -45)
 
@@ -257,6 +257,10 @@ const Player: React.FC = () => {
             canMove = false
         }
 
+        const ongoingRoll = !!rollManager.rollCoroutine
+        const canRoll = canMove && (inCombat && rollManager.lastRolled < Date.now() - 1000 && !playerVisualState.rollCooldown && energy >= 33) || ongoingRoll
+
+        const isRolling = canRoll && inputsState[InputKeys.SHIFT].active
         const isMoving = canMove && (xVel !== 0 || yVel !== 0)
         const isRunning = canMove && inputsState[InputKeys.SHIFT].active && !inCombat && energy > 0
 
@@ -266,7 +270,6 @@ const Player: React.FC = () => {
             }
         }
 
-        const ongoingRoll = !!rollManager.rollCoroutine
 
         if (ongoingRoll) {
 
@@ -276,11 +279,11 @@ const Player: React.FC = () => {
             const adjustedYVel = yVel * speed
 
             if (nippleState.active) {
-                xVel = numLerp(playerLocalState.xVelocity, adjustedXVel, 0.1)
-                yVel = numLerp(playerLocalState.yVelocity, adjustedYVel, 0.1)
+                xVel = numLerp(playerLocalState.rollXVelocity, adjustedXVel, 0.1)
+                yVel = numLerp(playerLocalState.rollYVelocity, adjustedYVel, 0.1)
             } else {
-                xVel = playerLocalState.xVelocity
-                yVel = playerLocalState.yVelocity
+                xVel = playerLocalState.rollXVelocity
+                yVel = playerLocalState.rollYVelocity
             }
 
 
@@ -291,9 +294,15 @@ const Player: React.FC = () => {
                 rollManager.cooldownCoroutine = coroutine(rollCooldownCoroutine)
             }
 
+            playerLocalState.rollXVelocity = xVel
+            playerLocalState.rollYVelocity = yVel
+
             applyVelocity(xVel, yVel)
 
         } else if (isMoving) {
+
+            const preSpeedXVel = xVel
+            const preSpeedYVel = yVel
 
             let speed = isRolling ? ROLLING_SPEED : isRunning ? RUNNING_SPEED : WALKING_SPEED
 
@@ -302,7 +311,16 @@ const Player: React.FC = () => {
 
             if (isRolling) {
 
+                const rollAngle = Math.atan2(preSpeedYVel, preSpeedXVel)
+
+                const rollX = Math.cos(rollAngle) * speed
+                const rollY = Math.sin(rollAngle) * speed
+
+                playerLocalState.rollXVelocity = rollX
+                playerLocalState.rollYVelocity = rollY
+
                 rollManager.rollCoroutine = coroutine(rollCoroutine)
+                rollManager.lastRolled = Date.now()
                 energy -= 33
 
             } else if (isRunning) {

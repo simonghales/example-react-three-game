@@ -9,6 +9,7 @@ export type InputState = {
     pressed: boolean,
     released: boolean,
     raw?: boolean,
+    rawLastPressed?: number,
 }
 
 export enum InputKeys {
