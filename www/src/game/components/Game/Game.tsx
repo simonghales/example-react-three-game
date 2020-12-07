@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Canvas} from "react-three-fiber";
 import {Box, Stats} from "@react-three/drei";
 import Floor from "../../../3d/components/Floor/Floor";
@@ -36,18 +36,9 @@ const StyledContainer = styled.div`
 
 const Game: React.FC = () => {
 
-    const ref = useRef()
-
     const handle = useFullScreenHandle()
     const {active, enter} = handle
 
-    // useEffect(() => {
-    //
-    //     nippleManager = nipplejs.create({
-    //         zone: ref.current,
-    //     });
-    //
-    // }, [])
 
     return (
         <FullScreen handle={handle}>

@@ -20,7 +20,7 @@ const PlayerVisuals: React.FC = () => {
 
     return (
         <Suspense fallback={null}>
-            <Knight recharging={recharging || preRecharging} lastDamaged={lastDamaged} lastAttack={lastAttack} moving={localPlayerState.moving} running={localPlayerState.running} position={[0, localPlayerState.rolling ? -1.5 : 0, 0]}/>
+            <Knight onPointerDown={(event) => console.log('down?', event)} onPointerOver={() => console.log('over')} recharging={recharging || preRecharging} lastDamaged={lastDamaged} lastAttack={lastAttack} moving={localPlayerState.moving} running={localPlayerState.running} position={[0, localPlayerState.rolling ? -1.5 : 0, 0]}/>
         </Suspense>
     );
 };

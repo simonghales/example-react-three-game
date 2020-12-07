@@ -1,7 +1,7 @@
 import React from "react";
 import {Html} from "@react-three/drei";
 import styled, {css} from "styled-components";
-import AttackUI from "../../../Game/components/AttackUIContainer/components/AttackUI/AttackUI";
+import AttackUI, {AttackContainerSize} from "../../../Game/components/AttackUIContainer/components/AttackUI/AttackUI";
 import {useEnemiesInCloseRange, useEnemiesInRange} from "../../../../../state/player";
 
 const cssSmaller = css`
@@ -18,7 +18,6 @@ const StyledRegion = styled.div<{
     smaller: boolean,
     large: boolean,
 }>`
-    border: 3px solid rgba(255,0,0,0.5);
     width: 200px;
     height: 200px;
     ${props => props.smaller ? cssSmaller : !props.large ? cssMedium : ''};
@@ -40,9 +39,7 @@ const PlayerUI: React.FC = () => {
     return (
         <group position={[0, 1.75, 0]}>
             <Html center portal={containerPortal.ref}>
-                <StyledRegion smaller={!enemiesInRange && !enemiesInCloseRange} large={enemiesInCloseRange}>
-                    <AttackUI/>
-                </StyledRegion>
+                <AttackUI size={enemiesInCloseRange ? AttackContainerSize.LARGE : enemiesInRange ? AttackContainerSize.MEDIUM : AttackContainerSize.SMALL}/>
             </Html>
         </group>
     );

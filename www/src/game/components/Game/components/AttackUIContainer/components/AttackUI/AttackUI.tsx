@@ -1,12 +1,33 @@
-import React, {useEffect, useRef} from "react";
-import styled from "styled-components";
+import React, {TouchEventHandler, useCallback, useEffect, useRef} from "react";
+import styled, {css} from "styled-components";
 import nipplejs, {JoystickManager} from "nipplejs";
-import {proxy} from "valtio";
+import {proxy, useProxy} from "valtio";
+import {useWindowSize} from "@react-hook/window-size";
 
-const StyledContainer = styled.div`
-    width: 100%;
-    height: 100%;
+export enum AttackContainerSize {
+    LARGE = 'LARGE',
+    MEDIUM = 'MEDIUM',
+    SMALL = 'SMALL'
+}
+
+const getAttackContainerSize = (size: AttackContainerSize): number => {
+    switch (size) {
+        case AttackContainerSize.LARGE:
+            return 200
+        case AttackContainerSize.MEDIUM:
+            return 150
+        default:
+            return 100
+    }
+}
+
+const StyledContainer = styled.div<{
+    containerSize: number
+}>`
     position: relative;
+    border: 3px solid rgba(255,0,0,0.5);
+    width: ${props => props.containerSize}px;
+    height: ${props => props.containerSize}px;
 `;
 
 export const attackStateProxy = proxy({
@@ -21,53 +42,119 @@ export const attackInputData = {
 
 export const attackBuffer: number[] = []
 
-// todo ! bug when container parent changes size, i think
+const getParentXY = (event: any): [number, number] => {
+    const parentTransform = event.target.parentElement.parentElement.style.transform
+    const transformSplit = parentTransform.split("(")[1].split(",")
+    const parentX = Number(transformSplit[0].trim().replace('px', ''))
+    const parentY = Number(transformSplit[1].trim().replace('px', ''))
+    return [parentX, parentY]
+}
 
-const AttackUI: React.FC = () => {
-
+const AttackUI: React.FC<{
+    size: AttackContainerSize,
+}> = ({size}) => {
     const ref = useRef<any>()
+    const containerSize = getAttackContainerSize(size)
 
-    useEffect(() => {
+    const calcOffset = useCallback((x: number, y: number, parentX: number, parentY: number) => {
 
-        const manager = nipplejs.create({
-            zone: ref.current,
-            // dataOnly: true,
-            mode: 'static',
-            position: {
-                top: '50%',
-                left: '50%',
-            }
-        });
+        const containerCenterX = parentX
+        const containerCenterY = parentY
 
-        manager.on("start", () => {
-            attackStateProxy.attackEngaged = true
-        })
+        // get angle
 
-        manager.on("end", () => {
-            attackBuffer.push(Date.now())
-            attackInputData.lastReleased = Date.now()
-            attackStateProxy.attackEngaged = false
-        })
+        const angle = Math.atan2((x - containerCenterX), (y - containerCenterY))
 
-        manager.on("move", (_, data) => {
+        const xVector = Math.cos(angle)
+        const yVector = Math.sin(angle)
 
-            const {x, y} = data.vector
+        const xDistance = Math.abs(x - containerCenterX)
+        const yDistance = Math.abs(y - containerCenterY)
 
-            if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
-                // attackInputData.xVel = 0
-                // attackInputData.yVel = 0
-                return
-            }
+        if (xDistance < 10 && yDistance < 10) {
+            // attackInputData.xVel = 0
+            // attackInputData.yVel = 0
+            return
+        }
 
-            attackInputData.xVel = x * -1
-            attackInputData.yVel = y
+        attackInputData.xVel = xVector * -1
+        attackInputData.yVel = yVector
 
-        })
+        console.log('calc offset', angle, xVector, yVector)
 
     }, [])
 
+    const onStart = useCallback((event: any) => {
+
+        attackStateProxy.attackEngaged = true
+
+        let x = 0
+        let y = 0
+
+        if (event.type === "mousedown") {
+
+            x = event.clientX
+            y = event.clientY
+
+        } else {
+            x = event.changedTouches[0].clientX
+            y = event.changedTouches[0].clientY
+        }
+
+        const [parentX, parentY] = getParentXY(event)
+
+        calcOffset(x, y, parentX, parentY)
+
+    }, [])
+
+    const onEnd = useCallback((event: any) => {
+
+        let x = 0
+        let y = 0
+
+        if (event.type === "mouseup") {
+
+            x = event.clientX
+            y = event.clientY
+
+        } else {
+            x = event.changedTouches[0].clientX
+            y = event.changedTouches[0].clientY
+        }
+
+        const [parentX, parentY] = getParentXY(event)
+
+        calcOffset(x, y, parentX, parentY)
+
+        attackBuffer.push(Date.now())
+        attackInputData.lastReleased = Date.now()
+        attackStateProxy.attackEngaged = false
+
+    }, [])
+
+    const onMove = useCallback((event: any) => {
+
+        let x = 0
+        let y = 0
+
+        if (event.type === "mousemove") {
+
+            x = event.clientX
+            y = event.clientY
+
+        } else {
+            x = event.targetTouches[0].clientX
+            y = event.targetTouches[0].clientY
+        }
+
+        const [parentX, parentY] = getParentXY(event)
+
+        calcOffset(x, y, parentX, parentY)
+
+    }, [size])
+
     return (
-        <StyledContainer ref={ref}/>
+        <StyledContainer containerSize={containerSize} ref={ref} onTouchStartCapture={onStart} onTouchEndCapture={onEnd} onTouchMoveCapture={onMove} onMouseDown={onStart} onMouseMoveCapture={onMove} onMouseUp={onEnd}/>
     );
 };
 

@@ -148,7 +148,6 @@ const Player: React.FC = () => {
     useEffect(() => {
 
         nippleManager?.on("start", () => {
-            console.log('normal start...')
             nippleState.active = true
             if (inputData.lastTouchStart > Date.now() - 450) {
                 inputsState[InputKeys.SHIFT].raw = true
@@ -329,7 +328,7 @@ const Player: React.FC = () => {
         const attackInputActive = attackStateProxy.attackEngaged
 
         const applyAttackAngle = () => {
-            const [attackXVel, attackYVel] = rotateVector(attackInputData.xVel, attackInputData.yVel, -45)
+            const [attackXVel, attackYVel] = rotateVector(attackInputData.xVel, attackInputData.yVel, 45)
             const angle = Math.atan2(-attackYVel, attackXVel) - radians(270)
             playerJoystickVelocity.targetAngle = angle
 
