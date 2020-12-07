@@ -18,8 +18,9 @@ const MobVisuals: React.FC<{
     isDead: boolean,
     id: number,
     targeted: boolean,
+    inAttackRange: boolean,
     variant: MOB_VARIANT,
-}> = ({localRef, variant, lastHit, lastAttacked, x, y, isDead, id, targeted}) => {
+}> = ({localRef, variant, lastHit, lastAttacked, x, y, isDead, id, targeted, inAttackRange}) => {
 
     const clickedTimestampsRef = useRef({
         lastClicked: 0,
@@ -66,7 +67,7 @@ const MobVisuals: React.FC<{
             {/*                       opacity={0.25}/>*/}
             {/*</Cylinder>*/}
             <MobUI id={id} variant={variant}/>
-            <Cylinder visible={targeted}>
+            <Cylinder visible={inAttackRange}>
                 <meshBasicMaterial attach="material" color={"black"} transparent
                                    opacity={0.25}/>
             </Cylinder>

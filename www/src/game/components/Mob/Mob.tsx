@@ -11,6 +11,11 @@ import {useMobBrain} from "./hooks/brain";
 import {MOB_VARIANT} from "./data";
 
 const useIsTargeted = (id: number): boolean => {
+    const targetID = usePlayerTarget()
+    return targetID === id
+}
+
+const useIsInAttackRange = (id: number): boolean => {
     const {attackRange} = useProxy(playerTargets)
     return attackRange.includes(id)
 }
@@ -31,6 +36,7 @@ const MobInner: React.FC<{
 
     const localRef = useRef<Object3D>(new Object3D())
     const isTargeted = useIsTargeted(id)
+    const inAttackRange = useIsInAttackRange(id)
     const isDead = useIsDead(id)
     const managerProxy = useProxy(getMobHealthManager(id))
 
@@ -49,7 +55,7 @@ const MobInner: React.FC<{
                     <MobPhysics variant={variant} x={x} y={y} id={id} localRef={localRef}/>
                 )
             }
-            <MobVisuals variant={variant} lastHit={managerProxy.lastHit} lastAttacked={managerProxy.lastAttacked} x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted}/>
+            <MobVisuals variant={variant} lastHit={managerProxy.lastHit} lastAttacked={managerProxy.lastAttacked} x={x} y={y} isDead={isDead} localRef={localRef} id={id} targeted={isTargeted} inAttackRange={inAttackRange}/>
             {
                 isTargeted && (
                     <MobTargetTracking localRef={localRef}/>
