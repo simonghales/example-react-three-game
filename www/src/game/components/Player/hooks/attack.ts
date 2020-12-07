@@ -6,7 +6,7 @@ import {playerVisualState} from "../components/PlayerVisuals/PlayerVisuals";
 import {playerTargets} from "../../../../state/player";
 import {dealDamageToMob, getMobHealthManager} from "../../../../state/mobs";
 import {getMobPosition} from "../../../../temp/ai";
-import {attackBuffer} from "../../Game/components/AttackUIContainer/components/AttackUI/AttackUI";
+import {attackBuffer, attackInputData} from "../../Game/components/AttackUIContainer/components/AttackUI/AttackUI";
 
 let attackCount = 0
 
@@ -37,9 +37,14 @@ const handleAttack = () => {
 
     attackState.lastAttack = Date.now()
     setTimeout(() => {
-        playerTargets.attackRange.forEach((mobID, index) => {
-            dealDamageToMob(mobID, index === 0)
-        })
+        const hasEnemies = playerTargets.attackRange.length > 0
+        if (hasEnemies) {
+            playerTargets.attackRange.forEach((mobID, index) => {
+                dealDamageToMob(mobID, index === 0)
+            })
+        } else {
+            attackInputData.nextAvailable = attackInputData.nextAvailable + 350
+        }
     }, 200)
 
 }

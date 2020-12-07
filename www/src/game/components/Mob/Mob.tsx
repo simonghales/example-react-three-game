@@ -4,15 +4,15 @@ import MobVisuals from "./components/MobVisuals/MobVisuals";
 import {Object3D} from "three";
 import MobTargetTracking from "./components/MobTargetTracking/MobTargetTracking";
 import {useProxy} from "valtio";
-import {usePlayerTarget} from "../../../state/player";
+import {playerTargets, usePlayerTarget} from "../../../state/player";
 import {deleteMobHealthManager, getMobHealthManager, initMobHealthManager} from "../../../state/mobs";
 import {addMob, removeMob, updateMob} from "../../../temp/ai";
 import {useMobBrain} from "./hooks/brain";
 import {MOB_VARIANT} from "./data";
 
 const useIsTargeted = (id: number): boolean => {
-    const targetID = usePlayerTarget()
-    return targetID === id
+    const {attackRange} = useProxy(playerTargets)
+    return attackRange.includes(id)
 }
 
 const useIsDead = (id: number): boolean => {

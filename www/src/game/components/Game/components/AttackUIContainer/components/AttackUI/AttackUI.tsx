@@ -38,6 +38,7 @@ export const attackInputData = {
     xVel: 0,
     yVel: 0,
     lastReleased: 0,
+    nextAvailable: 0,
 }
 
 export const attackBuffer: number[] = []
@@ -79,8 +80,6 @@ const AttackUI: React.FC<{
 
         attackInputData.xVel = xVector * -1
         attackInputData.yVel = yVector
-
-        console.log('calc offset', angle, xVector, yVector)
 
     }, [])
 
@@ -126,8 +125,14 @@ const AttackUI: React.FC<{
 
         calcOffset(x, y, parentX, parentY)
 
-        attackBuffer.push(Date.now())
-        attackInputData.lastReleased = Date.now()
+        const now = Date.now()
+
+        if (!attackInputData.nextAvailable || now >= attackInputData.nextAvailable) {
+            attackBuffer.push(now)
+            attackInputData.nextAvailable = now + 350
+        }
+
+        attackInputData.lastReleased = now
         attackStateProxy.attackEngaged = false
 
     }, [])
