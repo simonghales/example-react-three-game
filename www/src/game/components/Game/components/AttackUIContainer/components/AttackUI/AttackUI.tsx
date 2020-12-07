@@ -25,9 +25,16 @@ const StyledContainer = styled.div<{
     containerSize: number
 }>`
     position: relative;
-    border: 3px solid rgba(255,0,0,0.5);
+    padding:2px;
     width: ${props => props.containerSize}px;
     height: ${props => props.containerSize}px;
+`;
+
+const StyledInner = styled.div`
+    width: 100%;
+    height: 100%;
+    border: 3px solid rgba(255,0,0,0.5);
+    pointer-events: none;
 `;
 
 export const attackStateProxy = proxy({
@@ -159,7 +166,9 @@ const AttackUI: React.FC<{
     }, [size])
 
     return (
-        <StyledContainer containerSize={containerSize} ref={ref} onTouchStartCapture={onStart} onTouchEndCapture={onEnd} onTouchMoveCapture={onMove} onMouseDown={onStart} onMouseMoveCapture={onMove} onMouseUp={onEnd}/>
+        <StyledContainer containerSize={containerSize} ref={ref} onTouchStartCapture={onStart} onTouchEndCapture={onEnd} onTouchMoveCapture={onMove} onMouseDown={onStart} onMouseMoveCapture={onMove} onMouseUp={onEnd}>
+            <StyledInner/>
+        </StyledContainer>
     );
 };
 
