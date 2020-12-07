@@ -127,12 +127,11 @@ const playerJoystickVelocity = {
 }
 
 const WALKING_SPEED = 5
+const COMBAT_WALKING_SPEED = WALKING_SPEED * 1.25
 const RUNNING_SPEED = WALKING_SPEED * 2
 const ROLLING_SPEED = RUNNING_SPEED
 
 const tempVec2 = Vec2(0, 0)
-
-let thing = false
 
 const Player: React.FC = () => {
 
@@ -304,7 +303,7 @@ const Player: React.FC = () => {
             const preSpeedXVel = xVel
             const preSpeedYVel = yVel
 
-            let speed = isRolling ? ROLLING_SPEED : isRunning ? RUNNING_SPEED : WALKING_SPEED
+            let speed = isRolling ? ROLLING_SPEED : isRunning ? RUNNING_SPEED : inCombat ? COMBAT_WALKING_SPEED : WALKING_SPEED
 
             const adjustedXVel = xVel * speed
             const adjustedYVel = yVel * speed

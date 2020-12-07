@@ -5,12 +5,13 @@ import {useCallback} from "react";
 import {COLLISION_FILTER_GROUPS} from "../../../../physics/collisions/filters";
 import {
     addToPlayerAttackRange,
-    addToPlayerCloseRange,
+    addToPlayerCloseRange, addToPlayerFocusedRange,
     playerTargets, removeFromPlayerAttackRange,
-    removeFromPlayerCloseRange,
+    removeFromPlayerCloseRange, removeFromPlayerFocusedRange,
     removePlayerFromRange
 } from "../../../../state/player";
 import {FixtureType} from "../../../../physics/collisions/types";
+import {MOB_VARIANT} from "../../Mob/data";
 
 export const largeColliderRadius = 12
 export const smallColliderRadius = 4.5
@@ -33,10 +34,13 @@ export const usePlayerPhysics = () => {
     }, [])
 
     const onLargeCollideStart = useCallback((data: any, fixtureIndex: number) => {
-        const {mobID, type} = data
+        const {mobID, type, mobVariant} = data
         if (type === FixtureType.MOB) {
             if (fixtureIndex === 0) {
                 playerTargets.inRange.push(mobID)
+                if (mobVariant === MOB_VARIANT.large) {
+                    addToPlayerFocusedRange(mobID)
+                }
             } else if (fixtureIndex === 1) {
                 addToPlayerCloseRange(mobID)
             } else if (fixtureIndex === 2) {
@@ -45,8 +49,11 @@ export const usePlayerPhysics = () => {
         }
     }, [])
 
-    const onLargeCollideEnd = useCallback(({mobID}: {mobID: number}, fixtureIndex: number) => {
+    const onLargeCollideEnd = useCallback(({mobID, mobVariant}: {mobID: number, mobVariant: MOB_VARIANT}, fixtureIndex: number) => {
         if (fixtureIndex === 0) {
+            if (mobVariant === MOB_VARIANT.large) {
+                removeFromPlayerFocusedRange(mobID)
+            }
             removePlayerFromRange(mobID)
         } else if (fixtureIndex === 1) {
             removeFromPlayerCloseRange(mobID)

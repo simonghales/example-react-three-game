@@ -48,6 +48,7 @@ const MobPhysics: React.FC<{
                 filterCategoryBits: COLLISION_FILTER_GROUPS.mob | COLLISION_FILTER_GROUPS.attackReceiver | COLLISION_FILTER_GROUPS.physical,
                 userData: {
                     mobID: id,
+                    mobVariant: variant,
                     type: FixtureType.MOB,
                 }
             },

@@ -100,6 +100,7 @@ export const playerTargets = proxy<{
     attackRange: number[],
     closeRange: number[],
     inRange: number[],
+    focusedInRange: number[],
     targetID: number | null,
     lastAttacked: number | null,
     lastHitBy: number | null,
@@ -107,6 +108,7 @@ export const playerTargets = proxy<{
     attackRange: [],
     closeRange: [],
     inRange: [],
+    focusedInRange: [],
     targetID: null,
     lastAttacked: null,
     lastHitBy: null,
@@ -131,7 +133,7 @@ export const useEnemiesInCloseRange = (): boolean => {
 }
 
 export const usePlayerTarget = (): number | null => {
-    const {inRange, lastAttacked, attackRange, lastHitBy} = useProxy(playerTargets)
+    const {inRange, lastAttacked, attackRange, lastHitBy, focusedInRange} = useProxy(playerTargets)
 
     if (lastAttacked !== null && inRange.includes(lastAttacked)) {
         return lastAttacked
@@ -145,6 +147,11 @@ export const usePlayerTarget = (): number | null => {
 
         return attackRange[0]
     }
+
+    if (focusedInRange.length > 0) {
+        return focusedInRange[0]
+    }
+
     return null
 }
 
@@ -163,6 +170,17 @@ export const removePlayerFromRange = (mobID: number) => {
     const index = playerTargets.inRange.indexOf(mobID)
     if (index >= 0) {
         playerTargets.inRange.splice(index, 1)
+    }
+}
+
+export const addToPlayerFocusedRange = (mobID: number) => {
+    playerTargets.focusedInRange.push(mobID)
+}
+
+export const removeFromPlayerFocusedRange = (mobID: number) => {
+    const index = playerTargets.focusedInRange.indexOf(mobID)
+    if (index >= 0) {
+        playerTargets.focusedInRange.splice(index, 1)
     }
 }
 
