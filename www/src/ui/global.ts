@@ -13,6 +13,28 @@ export const GlobalStyle = createGlobalStyle`
     line-height: 1.2;
   }
   
+  canvas {
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -khtml-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    outline:0;
+    -webkit-tap-highlight-color:rgba(255,255,255,0);
+  }
+  
+  body {
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -khtml-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    outline:0;
+    -webkit-tap-highlight-color:rgba(255,255,255,0);
+  }
+  
   * {
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
